@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Test Scene A</title>
+	<!-- <script src="aframe.min.js"></script> -->
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		AFRAME.registerComponent('scene_generate', {
+			schema: {
+				col: {type: 'int', default: 25},
+				row: {type: 'int', default: 25},
+				objectDensity: {type: 'number', default: 0.8},
+				boxSize: {type: 'number', default: 1},
+				padding: {type: 'number', default: 3},
+				minHeight: {type: 'number', default: 1},
+				maxHeight: {type: 'number', default: 30},
+				skyColor: {type: 'color', default: "#f1f1e8"},
+				fogColor: {type: 'color', default: "#f1f1e8"},
+				fogDensity: {type: 'number', default: 0.1},
+				planeColor: {type: 'color', default: "#bfdcae"},
+				boxColor: {type: 'color', default: "#81b214"},
+			},
+
+			init: function () {
+				// generate pillars
+				for (var x = 0; x < this.data.col; x++) {
+					for (var z=0; z < this.data.row; z++){
+						if (Math.random() > this.data.objectDensity) continue;
+						var height = Math.random() * (this.data.maxHeight - this.data.minHeight);
+						height = height * (Math.abs(x - this.data.col/2.0) / (this.data.col/2.0) 
+												+ Math.abs(z - this.data.row/2.0) / (this.data.row/2.0)) + this.data.minHeight;
+						var posX = (x - this.data.col/2.0) * (this.data.boxSize + this.data.padding/2);
+						var posZ = (z - this.data.row/2.0) * (this.data.boxSize + this.data.padding/2);
+						var posY = height / 2.0;
+						var box = document.createElement('a-box');
+						box.setAttribute('position', {x: posX, y: posY, z: posZ});
+						box.setAttribute('color', this.data.boxColor);
+						box.setAttribute('height', height);
+						box.setAttribute('width', this.data.boxSize);
+						box.setAttribute('depth', this.data.boxSize);
+						this.el.appendChild(box);
+					}
+				}
+
+				// add plane
+				var planeWidth = (this.data.boxSize + this.data.padding) * this.data.col;
+				var planeHeight = (this.data.boxSize + this.data.padding) * this.data.row;
+				var plane = document.createElement('a-plane');
+				plane.setAttribute('color', this.data.planeColor);
+				plane.setAttribute('height', planeHeight);
+				plane.setAttribute('width', planeWidth);
+				plane.setAttribute('rotation', {x: -90, y: 0, z: 0});
+				this.el.appendChild(plane);
+
+				// modify fog & sky color
+				this.el.setAttribute('fog', {'color':this.data.fogColor, 'density':this.data.fogDensity});
+				this.el.querySelector('#sky').setAttribute('color',this.data.skyColor);
+			},
+
+			// update: function () {
+			// 	// Do something when component's data is updated.
+			// },
+
+			// remove: function () {
+			// 	// Do something the component or its entity is detached.
+			// },
+
+			tick: function (time, timeDelta) {
+				// Do something on every scene tick or frame.
+			}
+		});
+
+	</script>
+	<a-scene fog="type: exponential" scene_generate>
+		<a-camera id="camera" position="0 5 0"></a-camera>
+		<a-sky id="sky"></a-sky>
+		<a-entity light="type: ambient; color: #BBB"></a-entity>
+		<a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
+	</a-scene>
+</body>
+</html>
