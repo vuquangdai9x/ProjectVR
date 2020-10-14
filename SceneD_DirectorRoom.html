@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Director Room Abstract</title>
+	
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<!-- <script src="js/aframe.min.js"></script> -->
+
+	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script> 
+	<!-- <script src="js/aframe-event-set-component.min.js"></script> -->
+
+	<!-- <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script> -->
+	<!-- <script src="js/aframe-physics-system.min.js"></script> -->
+
+	<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+	<!-- <script src="js/aframe-extras.min.js"></script> -->
+	
+	<script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script> 
+	<!-- <script src="js/aframe-inspector-plugin-recast.js"></script> -->
+
+	<script src="https://unpkg.com/aframe-area-light-component/dist/aframe-area-light-component.min.js"></script>
+	<!-- <script src="js/aframe-area-light-component.min.js"></script> -->
+</head>
+<body>
+	<script type="text/javascript">
+		AFRAME.registerComponent('scene_init', {
+			schema: {
+				roomWidth: {type: 'number', default: 8},
+				roomDepth: {type: 'number', default: 6},
+				roomHeight: {type: 'number', default: 3},
+				wallThickness: {type: 'number', default: 0.1},
+				wallColor: {type: 'color', default: '#dedacf'},
+				floorColor: {type: 'color', default: '#ffffff'}
+			},
+
+			init: function () {
+				this.floorWall = this.el.querySelector('#floor');
+				this.ceilWall = this.el.querySelector('#ceil');
+				this.wall_N = this.el.querySelector('#wall-n');
+				this.wall_S = this.el.querySelector('#wall-s');
+				this.wall_W = this.el.querySelector('#wall-w');
+				this.wall_E = this.el.querySelector('#wall-e');
+			},
+
+			update: function () {
+				this.floorWall.setAttribute("width", this.data.roomWidth);
+				this.floorWall.setAttribute("height", this.data.wallThickness);
+				this.floorWall.setAttribute("depth", this.data.roomDepth);
+				this.floorWall.object3D.position.set(0,0,0);
+
+				this.ceilWall.setAttribute("width", this.data.roomWidth);
+				this.ceilWall.setAttribute("height", this.data.wallThickness);
+				this.ceilWall.setAttribute("depth", this.data.roomDepth);
+				this.ceilWall.object3D.position.set(0,this.data.roomHeight,0);
+
+				this.wall_N.setAttribute("width", this.data.roomWidth);
+				this.wall_N.setAttribute("height", this.data.roomHeight);
+				this.wall_N.setAttribute("depth", this.data.wallThickness);
+				this.wall_N.object3D.position.set(0,this.data.roomHeight/2.0,this.data.roomDepth/2.0);
+
+				this.wall_S.setAttribute("width", this.data.roomWidth);
+				this.wall_S.setAttribute("height", this.data.roomHeight);
+				this.wall_S.setAttribute("depth", this.data.wallThickness);
+				this.wall_S.object3D.position.set(0,this.data.roomHeight/2.0,-this.data.roomDepth/2.0);
+
+				this.wall_W.setAttribute("width", this.data.wallThickness);
+				this.wall_W.setAttribute("height", this.data.roomHeight);
+				this.wall_W.setAttribute("depth", this.data.roomDepth);
+				this.wall_W.object3D.position.set(-this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
+
+				this.wall_E.setAttribute("width", this.data.wallThickness);
+				this.wall_E.setAttribute("height", this.data.roomHeight);
+				this.wall_E.setAttribute("depth", this.data.roomDepth);
+				this.wall_E.object3D.position.set(this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
+
+				this.wall_W.setAttribute("color", this.data.wallColor);
+				this.wall_E.setAttribute("color", this.data.wallColor);
+				this.wall_N.setAttribute("color", this.data.wallColor);
+				this.wall_S.setAttribute("color", this.data.wallColor);
+				this.ceilWall.setAttribute("color", this.data.wallColor);
+				this.floorWall.setAttribute("color", this.data.floorColor);
+			},
+
+			// remove: function () {
+			// 	// Do something the component or its entity is detached.
+			// },
+
+			// tick: function (time, timeDelta) {
+			// 	// Do something on every scene tick or frame.
+			// }
+		});
+
+	</script>
+	<a-scene scene_init stats shadow="type: pcfsoft">
+		<a-assets>
+			<a-asset-item id="walkMesh" src="navmesh/navmesh.gltf"></a-asset-item>
+			<img id="skysphere_seashore" src="textures/Above_the_sea.jpg">
+			<a-mixin id="only_receive_shadow" shadow="cast: false; receive: true;"></a-mixin>
+		</a-assets>
+
+		<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
+		<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false"></a-entity>
+		<a-entity id="rig" movement-controls="constrainToNavMesh: true">
+			<a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true"></a-entity>
+		</a-entity>
+
+		<!-- room wall -->
+		<a-box id="floor" mixin="only_receive_shadow"></a-box>
+		<a-box id="ceil" mixin="only_receive_shadow"></a-box>
+		<a-box id="wall-n" mixin="only_receive_shadow" visible="false"></a-box>
+		<a-box id="wall-s" mixin="only_receive_shadow"></a-box>
+		<a-box id="wall-e" mixin="only_receive_shadow"></a-box>
+		<a-box id="wall-w" mixin="only_receive_shadow"></a-box>
+
+		<!-- room interior -->
+		<a-entity id="desk" geometry="depth: 2.4; width: 0.9" material="color: #784e3f" position="-2.34142 0.5 0" shadow></a-entity>
+
+		<!-- light -->
+		<a-entity light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
+
+		<a-entity geometry="height: 0.014; depth: 1.2; width: 0.3" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="0 2.945 0" shadow="">
+			<a-light type="spot" light="angle: 89; decay: 0; intensity: 0.4; penumbra: 0.16; castShadow: true" rotation="-90 0 0"></a-light>
+		</a-entity>
+		<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="2 2.945 0" shadow>
+			<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.4; penumbra: 0.16; castShadow: true;" rotation="-90 0 0"></a-light>
+		</a-entity>
+
+
+
+		<!-- <a-box id="#LED_ceil" material="color: #c7c7c7" position="0 2.93055 0" scale="1.2 0.014 0.3">
+			<a-entity id="ceilLight" area-light="intensity: 30; width: 0.95; height: 0.9" rotation="-90 0 0" position="-0.5 -0.51 0" scale=""></a-entity>
+		</a-box> -->
+	</a-scene>
+</body>
+</html>
