@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Test Model Loading</title>
+	<!-- <script src="aframe.min.js"></script> -->
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		AFRAME.registerComponent('scene_generate', {
+			schema: {
+				col: {type: 'int', default: 5},
+				row: {type: 'int', default: 5},
+				objectDensity: {type: 'number', default: 0.99},
+				boxSize: {type: 'number', default: 1},
+				padding: {type: 'number', default: 3},
+				minHeight: {type: 'number', default: 1},
+				maxHeight: {type: 'number', default: 30},
+				skyColor: {type: 'color', default: "#f1f1e8"},
+				fogColor: {type: 'color', default: "#f1f1e8"},
+				fogDensity: {type: 'number', default: 0.1},
+				planeColor: {type: 'color', default: "#bfdcae"},
+				boxColor: {type: 'color', default: "#81b214"},
+			},
+
+			init: function () {
+				
+			},
+
+			// update: function () {
+			// 	// Do something when component's data is updated.
+			// },
+
+			// remove: function () {
+			// 	// Do something the component or its entity is detached.
+			// },
+
+			// tick: function (time, timeDelta) {
+			// 	// Do something on every scene tick or frame.
+			// }
+		});
+
+	</script>
+	<a-scene fog="type: exponential" scene_generate stats>
+		<a-assets>
+			<a-asset-item id="roomModel" src="./models/scene.gltf"></a-asset-item>
+		</a-assets>
+		<a-entity gltf-model="#roomModel"></a-entity>
+		<a-camera id="camera" position="0 1.5 0">
+			<a-cursor ></a-cursor>
+		</a-camera>
+		<a-sky id="sky"></a-sky>
+		<a-entity light="type: ambient; color: #BBB"></a-entity>
+		<a-entity light="type: directional; color: #FFF; intensity: 0.6" position="-0.5 1 1"></a-entity>
+	</a-scene>
+</body>
+</html>
