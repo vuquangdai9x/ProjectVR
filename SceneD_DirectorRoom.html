@@ -745,8 +745,8 @@
 
 		<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
 		<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false"></a-entity>
-		<a-entity id="rig" movement-controls="constrainToNavMesh: true" laser-click-listener>
-			<a-entity camera position="0 1.6 0" look-controls-with-magnifier="pointerLockEnabled: true; mobileSlideSpeed:1; mobileRotateSpeed:0.0175">
+		<a-entity id="rig" movement-controls="constrainToNavMesh: true; controls:['gamepad', 'trackpad', 'keyboard']" laser-click-listener>
+			<a-entity camera position="0 1.6 0" look-controls-with-magnifier="pointerLockEnabled: true; mobileSlideSpeed:0.0175; mobileRotateSpeed:1">
 				<!-- <a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor> -->
 				<a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity>
 			</a-entity>
