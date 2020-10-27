@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Director Room Abstract</title>
+
+	<script src='https://cdn.jsdelivr.net/npm/webvr-polyfill@latest/build/webvr-polyfill.js'></script>
+
+<!-- 	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script> 
+	<script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>  -->
+	
+	<script src="js/look-controls-with-magnifier_test.js"></script>
+	<script src="js/aframe-inspector-plugin-recast.js"></script>
+	<script src="js/aframe.min.js"></script>
+	<script src="js/aframe-extras.min.js"></script>
+	<script src="js/aframe-event-set-component.min.js"></script>
+
+	<script src="js/aframe-keyboard-controls.js"></script>
+
+	<style type="text/css">
+		body{
+			padding: 0px;
+			margin: 0px;
+			display: flex;
+			flex-direction: column;
+			align-content: start;
+			/*overflow: hidden;*/
+			background-color: #222629;
+			font-family: Arial;
+		}
+
+		html, body {
+			height: 100%;
+			min-height: 100%;
+		}
+
+		#main{
+			/*width: 100%;*/
+			height: 100%;
+			display: flex;
+			flex-direction:column;
+			align-content: start;
+		}
+		a-scene {
+			/*width: 100%;
+			height: 100%;*/
+		}
+
+		#SceneView{
+			flex-basis: 90%;
+			/*height: 90%;*/
+			display: flex;
+			align-content: start;
+		}
+
+		#SettingUI{
+			flex-basis: 20%;
+			margin: 15px;
+		}
+		#SettingUI>h1{
+			color: #FFF;
+		}
+		#SettingUI>h2{
+			color: #86c232;
+		}
+		#ListTimeItems{
+			display: flex;
+			width: 100%;
+		}
+		.custom-button{
+			color: #86c232;	
+			background-color: transparent;
+			transition: background-color 0.25s;
+		}
+		.custom-button:hover{
+			background-color: #474b4f;
+			transition: background-color 0.1s;
+		}
+
+		.TimeItem{
+			flex-basis: 33.33%;
+			margin-right: 10px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+		}
+
+		#InputTime{
+			font-size: 1.5em;
+			margin: 10px 0px;
+			padding: 5px;
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;	
+		}
+		#InputTimeSlider{
+			-webkit-appearance: none;
+			outline: none;
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;		
+		}
+		#InputTimeSlider::-webkit-slider-thumb {
+			-webkit-appearance: none; /* Override default look */
+			width: 25px;
+			height: 25px;
+			border-radius: 3px;
+			background-color: #86c232;
+		}
+
+		.ScenarioItem{
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			padding: 10px;
+			margin-bottom: 5px;
+			text-align: left; 
+		}
+
+		#SceneContainer{
+			flex-basis: 80%;
+			margin: 15px;
+			margin-left: 0px;
+		}
+
+		#ListScene{
+			flex-basis: 10%;
+			display: flex;
+			align-content: start;
+			padding: 15px 7.5px;
+			
+		}
+		#ListSceneTitle{
+			margin-left: 7.5px;
+			margin-right: 7.5px;
+			flex-basis: 20%;
+			color: #86c232;
+		}
+		#ListSceneItem{
+			margin-left: 7.5px;
+			margin-right: 7.5px;
+			flex-basis: 80%;
+			display: flex;
+		}
+
+		.SceneItem{
+			padding: 15px;
+			margin-right: 15px;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;	
+			text-decoration: none;
+			vertical-align: middle;
+		}
+		
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		var polyfill = new WebVRPolyfill();
+		
+		AFRAME.registerComponent('scene_init', {
+			schema: {
+				roomWidth: {type: 'number', default: 8},
+				roomDepth: {type: 'number', default: 6},
+				roomHeight: {type: 'number', default: 3},
+				wallThickness: {type: 'number', default: 0.1},
+				wallColor: {type: 'color', default: '#dedacf'},
+				floorColor: {type: 'color', default: '#ffffff'}
+			},
+
+			init: function () {
+				this.floorWall = this.el.querySelector('#floor');
+				this.ceilWall = this.el.querySelector('#ceil');
+				this.wall_N = this.el.querySelector('#wall-n');
+				this.wall_S = this.el.querySelector('#wall-s');
+				this.wall_W = this.el.querySelector('#wall-w');
+				this.wall_E = this.el.querySelector('#wall-e');
+			},
+
+			update: function () {
+				this.floorWall.setAttribute("width", this.data.roomWidth);
+				this.floorWall.setAttribute("height", this.data.wallThickness);
+				this.floorWall.setAttribute("depth", this.data.roomDepth);
+				this.floorWall.object3D.position.set(0,0,0);
+
+				this.ceilWall.setAttribute("width", this.data.roomWidth);
+				this.ceilWall.setAttribute("height", this.data.wallThickness);
+				this.ceilWall.setAttribute("depth", this.data.roomDepth);
+				this.ceilWall.object3D.position.set(0,this.data.roomHeight,0);
+
+				this.wall_N.setAttribute("width", this.data.roomWidth);
+				this.wall_N.setAttribute("height", this.data.roomHeight);
+				this.wall_N.setAttribute("depth", this.data.wallThickness);
+				this.wall_N.object3D.position.set(0,this.data.roomHeight/2.0,this.data.roomDepth/2.0);
+
+				this.wall_S.setAttribute("width", this.data.roomWidth);
+				this.wall_S.setAttribute("height", this.data.roomHeight);
+				this.wall_S.setAttribute("depth", this.data.wallThickness);
+				this.wall_S.object3D.position.set(0,this.data.roomHeight/2.0,-this.data.roomDepth/2.0);
+
+				this.wall_W.setAttribute("width", this.data.wallThickness);
+				this.wall_W.setAttribute("height", this.data.roomHeight);
+				this.wall_W.setAttribute("depth", this.data.roomDepth);
+				this.wall_W.object3D.position.set(-this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
+
+				this.wall_E.setAttribute("width", this.data.wallThickness);
+				this.wall_E.setAttribute("height", this.data.roomHeight);
+				this.wall_E.setAttribute("depth", this.data.roomDepth);
+				this.wall_E.object3D.position.set(this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
+
+				this.wall_W.setAttribute("color", this.data.wallColor);
+				this.wall_E.setAttribute("color", this.data.wallColor);
+				this.wall_N.setAttribute("color", this.data.wallColor);
+				this.wall_S.setAttribute("color", this.data.wallColor);
+				this.ceilWall.setAttribute("color", this.data.wallColor);
+				this.floorWall.setAttribute("color", this.data.floorColor);
+			},
+
+			// remove: function () {
+			// 	// Do something the component or its entity is detached.
+			// },
+
+			// tick: function (time, timeDelta) {
+			// 	// Do something on every scene tick or frame.
+			// }
+		});
+
+		AFRAME.registerComponent('laser-listener', {
+			schema: {
+				showPoint: {type: 'boolean', default: true},
+				pointColor: {type: 'color', default: "#FF0000"},
+				pointRadius: {type: 'number', default: 0.025}
+			},
+			init: function () {
+				var intersectPointEl = document.createElement('a-entity');
+				this.el.sceneEl.appendChild(intersectPointEl);
+				this.intersectPointEl = intersectPointEl;
+
+				intersectPointEl.setAttribute('geometry', {
+					primitive: 'sphere',
+					radius: this.data.pointRadius
+				});
+				intersectPointEl.setAttribute('material', {
+					color: this.data.pointColor,
+					shader: 'flat'
+				});
+				intersectPointEl.setAttribute("visible", "false");
+				var showPoint = this.data.showPoint;
+
+				this.el.addEventListener('raycaster-intersected', evt => {
+					this.raycaster = evt.detail.el;
+					if (showPoint) intersectPointEl.setAttribute("visible", "true");
+				});
+				this.el.addEventListener('raycaster-intersected-cleared', evt => {
+					this.raycaster = null;
+					intersectPointEl.setAttribute("visible", "false");
+				});
+
+				this.el.addEventListener('laser-click', evt => {
+					var randomColor = 'hsla(' + (Math.random() * 360) + ', 100%, 50%, 1)';
+					this.el.setAttribute('material', 'color', randomColor);
+				});
+				this.el.addEventListener('laser-alt-click', evt => {
+					this.el.setAttribute('material', 'color', '#FFFFFF');
+				});
+			},
+
+			tick: function () {
+				if (!this.data.showPoint) { return; }
+				if (!this.raycaster) { return; }  // Not intersecting.
+				let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+				if (!intersection) { return; }
+				this.intersectPointEl.object3D.position.set(
+					intersection.point.x,
+					intersection.point.y,
+					intersection.point.z
+				);
+			}
+		});
+
+		// AFRAME.registerComponent('intersection-visualizer', {
+		// 	schema: {
+		// 		showPoint: {type: 'boolean', default: true},
+		// 		pointColor: {type: 'color', default: "#FF0000"},
+		// 		pointRadius: {type: 'number', default: 0.025}
+		// 	},
+		// 	init: function () {
+		// 		var randomColor = 'hsla(' + (Math.random() * 360) + ', 100%, 50%, 1)';
+		// 		var intersectPointEl = document.createElement('a-entity');
+		// 		this.el.sceneEl.appendChild(intersectPointEl);
+		// 		this.intersectPointEl = intersectPointEl;
+		// 		intersectPointEl.setAttribute('geometry', {
+		// 			primitive: 'sphere',
+		// 			radius: this.data.pointRadius
+		// 		});
+		// 		intersectPointEl.setAttribute('material', {
+		// 			color: this.data.pointColor,
+		// 			shader: 'flat'
+		// 		});
+		// 		intersectPointEl.setAttribute("visible", "false");
+		// 		var showPoint = this.data.showPoint;
+		// 		this.el.addEventListener('raycaster-intersected', evt => {
+		// 			this.raycaster = evt.detail.el;
+		// 			if (showPoint) intersectPointEl.setAttribute("visible", "true");
+		// 		});
+		// 		this.el.addEventListener('raycaster-intersected-cleared', evt => {
+		// 			this.raycaster = null;
+		// 			intersectPointEl.setAttribute("visible", "false");
+		// 		});
+		// 	},
+		// 	tick: function () {
+		// 		if (!this.raycaster) { return; }  // Not intersecting.
+		// 		let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+		// 		if (!intersection) { return; }
+		// 		this.intersectPointEl.object3D.position.set(
+		// 			intersection.point.x,
+		// 			intersection.point.y,
+		// 			intersection.point.z
+		// 		);
+		// 	}
+		// });
+
+		AFRAME.registerComponent('control-laser-by-keyboard', {
+			schema: {
+				speed: {type: 'number', default: 0.025},
+				limitAngleX: {type: 'number', default: 30.0/180.0*Math.PI},
+				limitAngleY: {type: 'number', default: 30.0/180.0*Math.PI}
+			},
+
+			init: function () {
+				this.keyboardControls = this.el.components['ex-keyboard-controls'];
+				this.raycaster = this.el.components['raycaster'];
+				this.isClickPrev = false;
+				this.isAltClickPrev = false;
+			},
+
+			tick: function (time, timeDelta) {
+				var rotation = this.el.object3D.rotation;
+				var isRotationChanged = true;
+				if (this.keyboardControls.isPressed('KeyI') || this.keyboardControls.isPressed('Numpad8')){
+					rotation.x += this.data.speed;
+					if (rotation.x > this.data.limitAngleX){
+						rotation.x = this.data.limitAngleX;
+					}
+				}
+				else if (this.keyboardControls.isPressed('KeyK') || this.keyboardControls.isPressed('Numpad5')){
+					rotation.x -= this.data.speed;
+					if (rotation.x < -this.data.limitAngleX){
+						rotation.x = -this.data.limitAngleX;
+					}
+				}
+				else if (this.keyboardControls.isPressed('KeyJ') || this.keyboardControls.isPressed('Numpad4')){
+					rotation.y += this.data.speed;
+					if (rotation.y > this.data.limitAngleY){
+						rotation.y = this.data.limitAngleY;
+					}
+				}
+				else if (this.keyboardControls.isPressed('KeyL') || this.keyboardControls.isPressed('Numpad6')){
+					rotation.y -= this.data.speed;
+					if (rotation.y < -this.data.limitAngleY){
+						rotation.y = -this.data.limitAngleY;
+					}
+				}
+				else if (this.keyboardControls.isPressed('KeyM') || this.keyboardControls.isPressed('Numpad1')){
+					rotation.x = rotation.y = rotation.z = 0;
+				}
+				else if (this.keyboardControls.isPressed('KeyU')  || this.keyboardControls.isPressed('Numpad7')){
+					if (this.isClickPrev) return;
+					if (!this.raycaster.intersectedEls) return;
+					for (var i = 0; i < this.raycaster.intersectedEls.length; i++) {
+						this.raycaster.intersectedEls[i].emit('laser-click', {}, false);
+					}
+					this.isClickPrev = true;
+				}
+				else if (this.keyboardControls.isPressed('KeyO')  || this.keyboardControls.isPressed('Numpad9')){
+					if (this.isAltClickPrev) return;
+					if (!this.raycaster.intersectedEls) return;
+					for (var i = 0; i < this.raycaster.intersectedEls.length; i++) {
+						this.raycaster.intersectedEls[i].emit('laser-alt-click', {}, false);
+					}
+					this.isAltClickPrev = true;
+				}
+				else{
+					isRotationChanged = false;
+					this.isClickPrev = false;
+					this.isAltClickPrev = false;
+				}
+				if (isRotationChanged){
+					this.el.object3D.rotation = rotation;
+				}
+			}
+		});
+	</script>
+	<!-- <div id="main"> -->
+		<div id="SceneView">
+			<div id="SettingUI">
+				<h1>Phòng giám đốc</h1>
+				<h2>Tùy chỉnh thời gian</h2>
+				<div id="ListTimeItems">
+					<button class="TimeItem custom-button">Sáng</button>
+					<button class="TimeItem custom-button">Chiều</button>
+					<button class="TimeItem custom-button">Tối</button>
+				</div>
+				<input type="time" name="time-info" id="InputTime" class="custom-button">
+				<input type="range" name="time-info-range" id="InputTimeSlider" min="1.0" max="24.0" class="custom-button">
+				<h2>Chọn kịch bản</h2>
+				<div id="ListScenario">
+					<button class="ScenarioItem custom-button">Tiếp khách</button>
+					<button class="ScenarioItem custom-button">Không có người</button>
+					<button class="ScenarioItem custom-button">Phòng đông người</button>
+				</div>
+			</div>
+			<div id="SceneContainer">
+				<!-- <a-scene scene_init stats shadow="type: pcfsoft" inspector-plugin-recast > -->
+				<!-- <a-scene scene_init stats shadow="type: pcfsoft" embedded> -->
+				<a-scene scene_init embedded>
+					<a-assets>
+						<a-asset-item id="walkMesh" src="navmesh/navmesh.gltf"></a-asset-item>
+						<img id="skysphere_seashore" src="textures/Above_the_sea.jpg"/>
+
+						<!-- <script id="LEDDownlightasasd" type="text/html">
+							<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="${ledposition}">
+								<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.4; penumbra: 0.16; castShadow: true;" rotation="-90 0 0"></a-light>
+							</a-entity>
+						</script> -->
+					</a-assets>
+
+					<canvas width="100%" height="100%"></canvas>
+
+					<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
+					<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false"></a-entity>
+					<a-entity id="rig" movement-controls="constrainToNavMesh: true" laser-click-listener>
+						<a-entity camera position="0 1.6 0" look-controls="pointerLockEnabled: true">
+							<!-- <a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor> -->
+							<a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity>
+						</a-entity>
+						<!-- <a-entity hand-controls="hand: left" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity> -->
+					</a-entity>
+					<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
+
+					<!-- room wall -->
+					<a-box id="floor" shadow="cast: false"></a-box>
+					<a-box id="ceil" shadow="cast: false"></a-box>
+					<a-box id="wall-n" shadow="cast: false" visible="false"></a-box>
+					<a-box id="wall-s" shadow="cast: false"></a-box>
+					<a-box id="wall-e" shadow="cast: false"></a-box>
+					<a-box id="wall-w" shadow="cast: false"></a-box>
+					<a-plane geometry="height: 6; width: 8" rotation="-90 0 0" color="#ff0000"></a-plane>
+
+					<!-- room interior -->
+					<a-box id="desk" geometry="depth: 2.4; width: 0.9" material="color: #784e3f" position="-2.34142 0.5 0" shadow class="laser-listener" laser-listener></a-box>
+
+					<!-- light -->
+					<a-entity light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
+					<a-entity light="intensity: 0.25; type: spot; castShadow: true; shadowRadius: 3" position="0 1.5 7"></a-entity>
+
+					<a-entity geometry="primitive: box; height: 0.014; depth: 1.2; width: 0.3" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="0 2.945 0">
+						<a-light type="spot" light="angle: 89; decay: 0; intensity: 0.4; penumbra: 0.75; castShadow: true" rotation="-90 0 0" position="0 -0.05 0"></a-light>
+					</a-entity>
+
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 2.945 2">
+						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
+					</a-entity>
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 2.945 -2">
+						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
+					</a-entity>
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 2.945 2">
+						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
+					</a-entity>
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 2.945 -2">
+						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16" rotation="-90 0 0"></a-light>
+					</a-entity>
+				</a-scene>
+			</div>
+		</div>
+		<div id="ListScene">
+			<h2 id="ListSceneTitle">Danh sách các phòng:</h2>
+			<div id="ListSceneItem">
+				<a href="" class="SceneItem custom-button">Phòng giám đốc</a>
+				<a href="" class="SceneItem custom-button">Nhà hàng</a>
+			</div>
+		</div>
+	<!-- </div> -->
+</body>
+</html>
