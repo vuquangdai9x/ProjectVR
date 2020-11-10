@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kitchen Room</title>
+
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script> 
+	<script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script> 
+	
+	<!-- <script src="js/look-controls-with-magnifier_test.js"></script>
+	<script src="js/aframe-inspector-plugin-recast.js"></script>
+	<script src="js/aframe.min.js"></script>
+	<script src="js/aframe-extras.min.js"></script>
+	<script src="js/aframe-event-set-component.min.js"></script> -->
+	<script src="js/aframe-area-light-component.min.js"></script>
+	
+
+	<script src="js/aframe-keyboard-controls.js"></script>
+
+</head>
+<body>
+	<script type="text/javascript">
+		
+	</script>
+	<!-- <a-scene scene_init stats shadow="type: pcfsoft" inspector-plugin-recast > -->
+	<a-scene scene_init shadow="type: pcfsoft">
+	<!-- <a-scene scene_init stats> -->
+		<a-assets>
+			<a-asset-item id="walkMesh" src="resources/model/living-room-02/LivingRoom-02-navmesh.gltf"></a-asset-item>
+			<img id="skysphere_seashore" src="resources/textures/Above_the_sea.jpg"/>
+			<img id="seemless_wall" src="resources/textures/seamless-wall-white.jpg"/>
+			<a-mixin id="wall" material="roughness: 1.0;" shadow="cast: false"></a-mixin>
+			<a-asset-item id="roomBox" src="resources/model/living-room-02/LivingRoom-02(packed).gltf"></a-asset-item>
+		</a-assets>
+
+		<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
+		<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false" position="-3 0 -5" ></a-entity>
+		<a-entity id="rig" movement-controls="constrainToNavMesh: true">
+			<a-entity camera position="3 1.2 5" look-controls="pointerLockEnabled: true">
+				<!-- <a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor> -->
+				<a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false"></a-entity>
+			</a-entity>
+			<!-- <a-entity hand-controls="hand: left" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity> -->
+		</a-entity>
+		<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
+
+		<!-- room wall -->
+		<!-- <a-entity geometry="depth: 6; height: 3; width: 8" material="side: double; roughness: 1" position="0 1.5 0"></a-entity> -->
+		<a-entity gltf-model="#roomBox" position="0 0 0" shadow></a-entity>
+
+		<!-- light -->
+		<a-entity light="type: ambient; color: #BBB; intensity: 0.4;"></a-entity>
+		<a-entity light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 100; shadowRadius: 0; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10; color: #ffc89e;" position="-8 2.5 -4" rotation="0 0 0" target="#directionaltarget"></a-entity>
+		<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
+
+		<!-- <a-entity light="intensity: 0.5; type: point" position="-1.13582 1.55856 -6.13295"></a-entity>
+		<a-entity light="intensity: 0.5; type: point" position="-4.10124 1.651 -3.40811"></a-entity>
+
+		<a-entity geometry="depth: 1.2; height: 0.04; width: 0.3" material="emissive: #ffffff; emissiveIntensity: 2" position="0 3 -1.5"></a-entity>
+		<a-entity light="angle: 89; penumbra: 1; type: spot;" rotation="-90 0 0" position="0 3 -1.5"></a-entity -->>
+	</a-scene>
+</body>
+</html>

@@ -271,7 +271,7 @@
 		<a-assets>
 			<a-asset-item id="walkMesh" src="navmesh/navmesh.gltf"></a-asset-item>
 			<img id="skysphere_seashore" src="textures/Above_the_sea.jpg"/>
-
+			<a-mixin id="wall" material="roughness: 1.0;" shadow="cast: false"></a-mixin>
 			<!-- <script id="LEDDownlightasasd" type="text/html">
 				<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="${ledposition}">
 					<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.4; penumbra: 0.16; castShadow: true;" rotation="-90 0 0"></a-light>
@@ -291,12 +291,13 @@
 		<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
 
 		<!-- room wall -->
-		<a-box id="floor" shadow="cast: false"></a-box>
-		<a-box id="ceil" shadow="cast: false"></a-box>
-		<a-box id="wall-n" shadow="cast: false" visible="false"></a-box>
-		<a-box id="wall-s" shadow="cast: false"></a-box>
-		<a-box id="wall-e" shadow="cast: false"></a-box>
-		<a-box id="wall-w" shadow="cast: false"></a-box>
+		<!-- room wall -->
+		<a-box id="floor" mixin="wall"></a-box>
+		<a-box id="ceil" mixin="wall"></a-box>
+		<a-box id="wall-n" mixin="wall" visible="false"></a-box>
+		<a-box id="wall-s" mixin="wall"></a-box>
+		<a-box id="wall-e" mixin="wall"></a-box>
+		<a-box id="wall-w" mixin="wall"></a-box>
 		<a-plane geometry="height: 6; width: 8" rotation="-90 0 0" color="#ff0000"></a-plane>
 
 		<!-- room interior -->

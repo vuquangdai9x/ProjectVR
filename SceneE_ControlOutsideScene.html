@@ -5,8 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Director Room Abstract</title>
 
-	<script src='https://cdn.jsdelivr.net/npm/webvr-polyfill@latest/build/webvr-polyfill.js'></script>
-
 <!-- 	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script> 
@@ -162,75 +160,6 @@
 </head>
 <body>
 	<script type="text/javascript">
-		var polyfill = new WebVRPolyfill();
-		
-		AFRAME.registerComponent('scene_init', {
-			schema: {
-				roomWidth: {type: 'number', default: 8},
-				roomDepth: {type: 'number', default: 6},
-				roomHeight: {type: 'number', default: 3},
-				wallThickness: {type: 'number', default: 0.1},
-				wallColor: {type: 'color', default: '#dedacf'},
-				floorColor: {type: 'color', default: '#ffffff'}
-			},
-
-			init: function () {
-				this.floorWall = this.el.querySelector('#floor');
-				this.ceilWall = this.el.querySelector('#ceil');
-				this.wall_N = this.el.querySelector('#wall-n');
-				this.wall_S = this.el.querySelector('#wall-s');
-				this.wall_W = this.el.querySelector('#wall-w');
-				this.wall_E = this.el.querySelector('#wall-e');
-			},
-
-			update: function () {
-				this.floorWall.setAttribute("width", this.data.roomWidth);
-				this.floorWall.setAttribute("height", this.data.wallThickness);
-				this.floorWall.setAttribute("depth", this.data.roomDepth);
-				this.floorWall.object3D.position.set(0,0,0);
-
-				this.ceilWall.setAttribute("width", this.data.roomWidth);
-				this.ceilWall.setAttribute("height", this.data.wallThickness);
-				this.ceilWall.setAttribute("depth", this.data.roomDepth);
-				this.ceilWall.object3D.position.set(0,this.data.roomHeight,0);
-
-				this.wall_N.setAttribute("width", this.data.roomWidth);
-				this.wall_N.setAttribute("height", this.data.roomHeight);
-				this.wall_N.setAttribute("depth", this.data.wallThickness);
-				this.wall_N.object3D.position.set(0,this.data.roomHeight/2.0,this.data.roomDepth/2.0);
-
-				this.wall_S.setAttribute("width", this.data.roomWidth);
-				this.wall_S.setAttribute("height", this.data.roomHeight);
-				this.wall_S.setAttribute("depth", this.data.wallThickness);
-				this.wall_S.object3D.position.set(0,this.data.roomHeight/2.0,-this.data.roomDepth/2.0);
-
-				this.wall_W.setAttribute("width", this.data.wallThickness);
-				this.wall_W.setAttribute("height", this.data.roomHeight);
-				this.wall_W.setAttribute("depth", this.data.roomDepth);
-				this.wall_W.object3D.position.set(-this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
-
-				this.wall_E.setAttribute("width", this.data.wallThickness);
-				this.wall_E.setAttribute("height", this.data.roomHeight);
-				this.wall_E.setAttribute("depth", this.data.roomDepth);
-				this.wall_E.object3D.position.set(this.data.roomWidth/2.0,this.data.roomHeight/2.0,0);
-
-				this.wall_W.setAttribute("color", this.data.wallColor);
-				this.wall_E.setAttribute("color", this.data.wallColor);
-				this.wall_N.setAttribute("color", this.data.wallColor);
-				this.wall_S.setAttribute("color", this.data.wallColor);
-				this.ceilWall.setAttribute("color", this.data.wallColor);
-				this.floorWall.setAttribute("color", this.data.floorColor);
-			},
-
-			// remove: function () {
-			// 	// Do something the component or its entity is detached.
-			// },
-
-			// tick: function (time, timeDelta) {
-			// 	// Do something on every scene tick or frame.
-			// }
-		});
-
 		AFRAME.registerComponent('laser-listener', {
 			schema: {
 				showPoint: {type: 'boolean', default: true},
@@ -271,7 +200,7 @@
 				});
 			},
 
-			tick: function () {
+			tock: function () {
 				if (!this.data.showPoint) { return; }
 				if (!this.raycaster) { return; }  // Not intersecting.
 				let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
@@ -283,48 +212,6 @@
 				);
 			}
 		});
-
-		// AFRAME.registerComponent('intersection-visualizer', {
-		// 	schema: {
-		// 		showPoint: {type: 'boolean', default: true},
-		// 		pointColor: {type: 'color', default: "#FF0000"},
-		// 		pointRadius: {type: 'number', default: 0.025}
-		// 	},
-		// 	init: function () {
-		// 		var randomColor = 'hsla(' + (Math.random() * 360) + ', 100%, 50%, 1)';
-		// 		var intersectPointEl = document.createElement('a-entity');
-		// 		this.el.sceneEl.appendChild(intersectPointEl);
-		// 		this.intersectPointEl = intersectPointEl;
-		// 		intersectPointEl.setAttribute('geometry', {
-		// 			primitive: 'sphere',
-		// 			radius: this.data.pointRadius
-		// 		});
-		// 		intersectPointEl.setAttribute('material', {
-		// 			color: this.data.pointColor,
-		// 			shader: 'flat'
-		// 		});
-		// 		intersectPointEl.setAttribute("visible", "false");
-		// 		var showPoint = this.data.showPoint;
-		// 		this.el.addEventListener('raycaster-intersected', evt => {
-		// 			this.raycaster = evt.detail.el;
-		// 			if (showPoint) intersectPointEl.setAttribute("visible", "true");
-		// 		});
-		// 		this.el.addEventListener('raycaster-intersected-cleared', evt => {
-		// 			this.raycaster = null;
-		// 			intersectPointEl.setAttribute("visible", "false");
-		// 		});
-		// 	},
-		// 	tick: function () {
-		// 		if (!this.raycaster) { return; }  // Not intersecting.
-		// 		let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-		// 		if (!intersection) { return; }
-		// 		this.intersectPointEl.object3D.position.set(
-		// 			intersection.point.x,
-		// 			intersection.point.y,
-		// 			intersection.point.z
-		// 		);
-		// 	}
-		// });
 
 		AFRAME.registerComponent('control-laser-by-keyboard', {
 			schema: {
@@ -403,12 +290,12 @@
 				<h1>Phòng giám đốc</h1>
 				<h2>Tùy chỉnh thời gian</h2>
 				<div id="ListTimeItems">
-					<button class="TimeItem custom-button">Sáng</button>
-					<button class="TimeItem custom-button">Chiều</button>
-					<button class="TimeItem custom-button">Tối</button>
+					<button class="TimeItem custom-button" onclick="setTime(7500)">Sáng</button>
+					<button class="TimeItem custom-button" onclick="setTime(15000)">Chiều</button>
+					<button class="TimeItem custom-button" onclick="setTime(20000)">Tối</button>
 				</div>
-				<input type="time" name="time-info" id="InputTime" class="custom-button">
-				<input type="range" name="time-info-range" id="InputTimeSlider" min="1.0" max="24.0" class="custom-button">
+				<input type="time" name="time-info" id="InputTime" class="custom-button" onchange="onChangeTime(this)">
+				<input type="range" name="time-info-range" id="InputTimeSlider" min="1" max="24" class="custom-button" onchange="onChangeTime(this)">
 				<h2>Chọn kịch bản</h2>
 				<div id="ListScenario">
 					<button class="ScenarioItem custom-button">Tiếp khách</button>
@@ -422,16 +309,11 @@
 				<a-scene scene_init embedded>
 					<a-assets>
 						<a-asset-item id="walkMesh" src="navmesh/navmesh.gltf"></a-asset-item>
-						<img id="skysphere_seashore" src="textures/Above_the_sea.jpg"/>
-
-						<!-- <script id="LEDDownlightasasd" type="text/html">
-							<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="${ledposition}">
-								<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.4; penumbra: 0.16; castShadow: true;" rotation="-90 0 0"></a-light>
-							</a-entity>
-						</script> -->
+						<img id="skysphere_seashore" src="resources/textures/Above_the_sea.jpg"/>
+						<img id="seemless_wall" src="resources/textures/seamless-wall-white.jpg"/>
+						<a-mixin id="wall" material="roughness: 1.0;" shadow="cast: false"></a-mixin>
+						<a-asset-item id="roomBox" src="resources/model/room-box-thick.gltf"></a-asset-item>
 					</a-assets>
-
-					<canvas width="100%" height="100%"></canvas>
 
 					<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
 					<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false"></a-entity>
@@ -445,35 +327,31 @@
 					<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
 
 					<!-- room wall -->
-					<a-box id="floor" shadow="cast: false"></a-box>
-					<a-box id="ceil" shadow="cast: false"></a-box>
-					<a-box id="wall-n" shadow="cast: false" visible="false"></a-box>
-					<a-box id="wall-s" shadow="cast: false"></a-box>
-					<a-box id="wall-e" shadow="cast: false"></a-box>
-					<a-box id="wall-w" shadow="cast: false"></a-box>
-					<a-plane geometry="height: 6; width: 8" rotation="-90 0 0" color="#ff0000"></a-plane>
+					<!-- <a-entity geometry="depth: 6; height: 3; width: 8" material="side: double; roughness: 1" position="0 1.5 0"></a-entity> -->
+					<a-entity gltf-model="#roomBox" material="side: double; roughness: 1" scale="0.5 0.5 0.5" rotation="0 -90 0" position="0 1.5 0" shadow></a-entity>
 
 					<!-- room interior -->
-					<a-box id="desk" geometry="depth: 2.4; width: 0.9" material="color: #784e3f" position="-2.34142 0.5 0" shadow class="laser-listener" laser-listener></a-box>
+					<a-box id="desk" geometry="depth: 2.4; width: 0.9" material="color: #784e3f; side: double; roughness: 1" position="-2.34142 0.5 0" shadow class="laser-listener" laser-listener></a-box>
 
 					<!-- light -->
 					<a-entity light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
-					<a-entity light="intensity: 0.25; type: spot; castShadow: true; shadowRadius: 3" position="0 1.5 7"></a-entity>
+					<a-entity light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 50; shadowRadius: 0;" position="0 10 10" rotation="0 0 0" target="#directionaltarget"></a-entity>
+					<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
 
-					<a-entity geometry="primitive: box; height: 0.014; depth: 1.2; width: 0.3" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="0 2.945 0">
-						<a-light type="spot" light="angle: 89; decay: 0; intensity: 0.4; penumbra: 0.75; castShadow: true" rotation="-90 0 0" position="0 -0.05 0"></a-light>
+					<a-entity geometry="primitive: box; height: 0.014; depth: 1.2; width: 0.3" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="0 3 0">
+						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.4; penumbra: 0.75; castShadow: true; shadowBias: -0.003; shadowCameraFar: 50; shadowRadius: 0;" rotation="-90 0 0" position="0 -0.05 0"></a-light>
 					</a-entity>
 
-					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 2.945 2">
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 3 2">
 						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
 					</a-entity>
-					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 2.945 -2">
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="3 3 -2">
 						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
 					</a-entity>
-					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 2.945 2">
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 3 2">
 						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16;" rotation="-90 0 0"></a-light>
 					</a-entity>
-					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 2.945 -2">
+					<a-entity geometry="primitive: cylinder; height: 0.045; segmentsHeight: 1; radius: 0.058; segmentsRadial: 15; thetaStart: -2.75" material="color: #f7f7f7; emissive: #ffffff; emissiveIntensity: 0.75" position="-3 3 -2">
 						<a-light type="spot" light="angle: 80; decay: 0; intensity: 0.1; penumbra: 0.16" rotation="-90 0 0"></a-light>
 					</a-entity>
 				</a-scene>
@@ -487,5 +365,39 @@
 			</div>
 		</div>
 	<!-- </div> -->
+
+	<script type="text/javascript">
+		var timeInput = document.getElementById("InputTime");
+		var timeInputSlider = document.getElementById("InputTimeSlider");
+		function setTime(time){
+			var hour = parseInt(parseInt(time) / 1000);
+			timeInputSlider = hour;
+			var minute = parseInt(parseInt(time-hour*1000) * 60 / 1000);
+			if (hour < 10){
+				hour = "0"+hour;
+			}
+			if (minute < 10){
+				minute = "0"+minute;
+			}
+			timeInput.value = hour + ":" + minute + ":00";
+			
+			document.getElementById("InputTimeSlider");
+		}
+		function onChangeTime(el){
+			setTime(el.value);
+		}
+
+		var scene = document.querySelector('a-scene');
+
+		if (scene.hasLoaded) {
+		  run();
+		} else {
+		  scene.addEventListener('loaded', run);
+		}
+
+		function run () {
+		  
+		}
+	</script>
 </body>
 </html>
