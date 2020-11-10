@@ -15,52 +15,120 @@
 	<script src="js/aframe.min.js"></script>
 	<script src="js/aframe-extras.min.js"></script>
 	<script src="js/aframe-event-set-component.min.js"></script> -->
-	<script src="js/aframe-area-light-component.min.js"></script>
-	
-
-	<script src="js/aframe-keyboard-controls.js"></script>
+	<!-- <script src="js/aframe-area-light-component.min.js"></script> -->
+	<!-- <script src="js/aframe-keyboard-controls.js"></script> -->
 
 </head>
 <body>
 	<script type="text/javascript">
-		
+		AFRAME.registerComponent('on-init-scene', {
+			init: function () {
+				
+			},
+		});
+
+		AFRAME.registerComponent('update-shadowmap-when-loaded', {
+			init: function () {
+				var _self = this;
+				this.el.addEventListener('loaded', function () {
+					console.log("loaded");
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+				this.el.addEventListener('model-loaded', function () {
+					console.log("model-loaded");
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+			},
+		});
+
+		AFRAME.registerComponent('update-shadowmap-on-change-prop', {
+			init: function () {
+				var _self = this;
+				this.el.addEventListener('componentchanged', function () {
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+			},
+		});
+
+		AFRAME.registerComponent('click-to-toggle-light', {
+			schema: {
+				lightOn: {type: 'boolean', default: true},
+				targetLight: {type: 'selector'},
+				colorWhenLightOn: {type: 'color', default: '#fff'},
+				colorWhenLightOff: {type: 'color', default: '#777'}
+			},
+			init: function () {
+				var _self = this;
+				this.el.addEventListener('click', function () {
+					let isLightOn = !_self.data.lightOn;
+					_self.data.lightOn = isLightOn;
+					_self.data.targetLight.setAttribute("visible", isLightOn);
+					_self.el.setAttribute("material", {
+						'color': (isLightOn?_self.data.colorWhenLightOn:_self.data.colorWhenLightOff)
+					});
+				});
+			},
+		});
 	</script>
 	<!-- <a-scene scene_init stats shadow="type: pcfsoft" inspector-plugin-recast > -->
-	<a-scene scene_init shadow="type: pcfsoft">
+	<a-scene stats on-init-scene shadow="type: pcfsoft; autoUpdate: false;">
 	<!-- <a-scene scene_init stats> -->
 		<a-assets>
 			<a-asset-item id="walkMesh" src="resources/model/living-room-02/LivingRoom-02-navmesh.gltf"></a-asset-item>
 			<img id="skysphere_seashore" src="resources/textures/Above_the_sea.jpg"/>
 			<img id="seemless_wall" src="resources/textures/seamless-wall-white.jpg"/>
 			<a-mixin id="wall" material="roughness: 1.0;" shadow="cast: false"></a-mixin>
-			<a-asset-item id="roomBox" src="resources/model/living-room-02/LivingRoom-02(packed).gltf"></a-asset-item>
+			<a-asset-item id="roomBox" src="resources/model/living-room-02/LivingRoom-02(packed).gltf" update-shadowmap-when-loaded></a-asset-item>
+			<img id="living-room-360" src="resources/textures/living-room-360.png">
 		</a-assets>
 
-		<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
-		<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false" position="-3 0 -5" ></a-entity>
-		<a-entity id="rig" movement-controls="constrainToNavMesh: true">
+		<a-sky id="sky" src="#skysphere_seashore"></a-sky>
+		<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false" position="-3 0 -5"></a-entity>
+		<a-entity id="rig" movement-controls="constrainToNavMesh: true; speed: 0.2">
 			<a-entity camera position="3 1.2 5" look-controls="pointerLockEnabled: true">
-				<!-- <a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor> -->
-				<a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false"></a-entity>
+				<a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor>
+				<!-- <a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false"></a-entity> -->
 			</a-entity>
 			<!-- <a-entity hand-controls="hand: left" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity> -->
 		</a-entity>
 		<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
 
 		<!-- room wall -->
-		<!-- <a-entity geometry="depth: 6; height: 3; width: 8" material="side: double; roughness: 1" position="0 1.5 0"></a-entity> -->
-		<a-entity gltf-model="#roomBox" position="0 0 0" shadow></a-entity>
+		<a-entity gltf-model="#roomBox" position="0 0 0" shadow update-shadowmap-when-loaded></a-entity>
+		<a-entity geometry="depth: 4.8; height: 2.5; width: 0.025" material="opacity: 0.3; transparent: true" position="-3.93082 1.663 -3.53577"></a-entity>
+
+		<a-entity geometry="depth: 0.025; height: 2.5; width: 5.4" material="opacity: 0.3; transparent: true" position="-1.17275 1.653 -5.95516"></a-entity>
 
 		<!-- light -->
-		<a-entity light="type: ambient; color: #BBB; intensity: 0.4;"></a-entity>
-		<a-entity light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 100; shadowRadius: 0; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10; color: #ffc89e;" position="-8 2.5 -4" rotation="0 0 0" target="#directionaltarget"></a-entity>
+		<a-entity id="ambientLight" light="type: ambient; color: #BBB; intensity: 0.4;"></a-entity>
+		<a-entity id="sunLight" light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 100; shadowRadius: 1; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10; color: #e5935d;" position="-8 2.15 -4" rotation="0 0 0" target="#directionaltarget" update-shadowmap-on-change-prop shadow update-shadowmap-when-loaded></a-entity>
 		<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
 
-		<!-- <a-entity light="intensity: 0.5; type: point" position="-1.13582 1.55856 -6.13295"></a-entity>
-		<a-entity light="intensity: 0.5; type: point" position="-4.10124 1.651 -3.40811"></a-entity>
+		<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="0 1.5 1.43097" material="flatShading: true; shader: flat;">
+			<a-entity text="color: white; align: center; font: roboto; value: Study Room; width: 5" position="0 1.25 -0.025" rotation="0 180 0"></a-entity>
+			<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneF_StudyRoom.html; title: Study Room; image: #living-room-360;" material="shader: portal; pano: #living-room-360; side: back"></a-entity>
+		</a-entity>
 
-		<a-entity geometry="depth: 1.2; height: 0.04; width: 0.3" material="emissive: #ffffff; emissiveIntensity: 2" position="0 3 -1.5"></a-entity>
-		<a-entity light="angle: 89; penumbra: 1; type: spot;" rotation="-90 0 0" position="0 3 -1.5"></a-entity -->>
+		<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="0 -2.5 1.43097" material="flatShading: true; shader: flat;">
+			<a-entity text="color: white; align: center; font: roboto; value: Living Room; width: 5" position="0 1.25 -0.025" rotation="0 180 0"></a-entity>
+			<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneF_StudyRoom.html; title: Living Room; image: #living-room-360;" material="shader: portal; pano: #living-room-360; side: back"></a-entity>
+		</a-entity>
+
+		<a-entity geometry="depth: 1.2; height: 0.04; width: 0.4" material="shader: flat" position="0 2.88341 -1.2752" click-to-toggle-light="targetLight: #flatCeilLED;" class="gaze-listener"></a-entity>
+		<a-entity id="flatCeilLED" light="intensity: 0.5; type: point" position="0 2.65785 -1.28913"></a-entity>
+
+		<a-entity id="light-at-door" light="intensity: 0.2; type: point" position="2.6238 2 7.29303"></a-entity>
+		<a-entity id="light-at-window-1" light="intensity: 0.2; type: point" position="-1.13582 1.55856 -6.13295" visible="false"></a-entity>
+		<a-entity id="light-at-window-2" light="intensity: 0.2; type: point" position="-4.10124 1.651 -3.40811" visible="false"></a-entity>
 	</a-scene>
+
+	<script type="text/javascript">
+		document.onkeyup = function(e) {
+		  if (e.ctrlKey && e.shiftKey && e.which == 83) {
+		    var img = document.querySelector('a-scene').components.screenshot.getCanvas('equirectangular').toDataURL("image/png");
+    		document.write('<img src="'+img+'"/>');
+		  }
+		};
+	</script>
 </body>
 </html>

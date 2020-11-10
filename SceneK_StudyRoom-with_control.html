@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Director Room Abstract</title>
+
+<!-- 	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+	<script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script> 
+	<script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>  -->
+	
+	<script src="js/aframe.min.js"></script>
+	<script src="js/aframe-extras.min.js"></script>
+	<script src="js/aframe-event-set-component.min.js"></script>
+
+	<style type="text/css">
+		body{
+			padding: 0px;
+			margin: 0px;
+			display: flex;
+			flex-direction: column;
+			align-content: start;
+			/*overflow: hidden;*/
+			background-color: #222629;
+			font-family: Arial;
+		}
+
+		html, body {
+			height: 100%;
+			min-height: 100%;
+		}
+
+		#main{
+			/*width: 100%;*/
+			height: 100%;
+			display: flex;
+			flex-direction:column;
+			align-content: start;
+		}
+		a-scene {
+			/*width: 100%;
+			height: 100%;*/
+		}
+
+		#SceneView{
+			flex-basis: 90%;
+			/*height: 90%;*/
+			display: flex;
+			align-content: start;
+		}
+
+		#SettingUI{
+			flex-basis: 20%;
+			margin: 15px;
+		}
+		#SettingUI>h1{
+			color: #FFF;
+		}
+		#SettingUI>h2{
+			color: #86c232;
+		}
+		#ListTimeItems{
+			display: flex;
+			width: 100%;
+		}
+		.custom-button{
+			color: #86c232;	
+			background-color: transparent;
+			transition: background-color 0.25s;
+		}
+		.custom-button:hover{
+			background-color: #474b4f;
+			transition: background-color 0.1s;
+		}
+
+		.TimeItem{
+			flex-basis: 33.33%;
+			margin-right: 10px;
+			padding: 5px;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+		}
+
+		#InputTime{
+			font-size: 1.5em;
+			margin: 10px 0px;
+			padding: 5px;
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;	
+		}
+		#InputTimeSlider{
+			-webkit-appearance: none;
+			outline: none;
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;		
+		}
+		#InputTimeSlider::-webkit-slider-thumb {
+			-webkit-appearance: none; /* Override default look */
+			width: 25px;
+			height: 25px;
+			border-radius: 3px;
+			background-color: #86c232;
+		}
+
+		.ScenarioItem{
+			width: 90%;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			padding: 10px;
+			margin-bottom: 5px;
+			text-align: left; 
+		}
+
+		#SceneContainer{
+			flex-basis: 80%;
+			margin: 15px;
+			margin-left: 0px;
+		}
+
+		#ListScene{
+			flex-basis: 10%;
+			display: flex;
+			align-content: start;
+			padding: 15px 7.5px;
+			
+		}
+		#ListSceneTitle{
+			margin-left: 7.5px;
+			margin-right: 7.5px;
+			flex-basis: 20%;
+			color: #86c232;
+		}
+		#ListSceneItem{
+			margin-left: 7.5px;
+			margin-right: 7.5px;
+			flex-basis: 80%;
+			display: flex;
+		}
+
+		.SceneItem{
+			padding: 15px;
+			margin-right: 15px;
+			border-radius: 5px;
+			border: 2px solid #61892f;
+			color: #86c232;	
+			text-decoration: none;
+			vertical-align: middle;
+		}
+		
+	</style>
+</head>
+<body>
+	<script type="text/javascript">
+		AFRAME.registerComponent('update-shadowmap-when-loaded', {
+			init: function () {
+				var _self = this;
+				this.el.addEventListener('loaded', function () {
+					console.log("loaded");
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+				this.el.addEventListener('model-loaded', function () {
+					console.log("model-loaded");
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+			},
+		});
+
+		AFRAME.registerComponent('update-shadowmap-on-change-prop', {
+			init: function () {
+				var _self = this;
+				this.el.addEventListener('componentchanged', function () {
+					_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
+				});
+			},
+		});
+
+		AFRAME.registerComponent('click-to-toggle-light', {
+			schema: {
+				lightOn: {type: 'boolean', default: true},
+				targetLight: {type: 'selector'},
+				colorWhenLightOn: {type: 'color', default: '#fff'},
+				colorWhenLightOff: {type: 'color', default: '#777'}
+			},
+			init: function () {
+				var _self = this;
+				let isLightOn = this.data.lightOn;
+				this.data.targetLight.setAttribute("visible", isLightOn);
+				_self.el.setAttribute("material", {
+					'color': (isLightOn?_self.data.colorWhenLightOn:_self.data.colorWhenLightOff)
+				});
+				this.el.addEventListener('click', function () {
+					let isLightOn = !_self.data.lightOn;
+					_self.data.lightOn = isLightOn;
+					_self.data.targetLight.setAttribute("visible", isLightOn);
+					_self.el.setAttribute("material", {
+						'color': (isLightOn?_self.data.colorWhenLightOn:_self.data.colorWhenLightOff)
+					});
+				});
+			},
+		});
+	</script>
+	<!-- <div id="main"> -->
+		<div id="SceneView">
+			<div id="SettingUI">
+				<h1>Phòng giám đốc</h1>
+				<h2>Tùy chỉnh thời gian</h2>
+				<div id="ListTimeItems">
+					<button class="TimeItem custom-button" onclick="setTime(7500)">Sáng</button>
+					<button class="TimeItem custom-button" onclick="setTime(15000)">Chiều</button>
+					<button class="TimeItem custom-button" onclick="setTime(20000)">Tối</button>
+				</div>
+				<input type="time" name="time-info" id="InputTime" class="custom-button" onchange="setTime(this.value)">
+				<input type="range" name="time-info-range" id="InputTimeSlider" min="0" max="23999" class="custom-button" onchange="setTime(this.value)" oninput="setTime(this.value, false)">
+				<h2>Chọn kịch bản</h2>
+				<div id="ListScenario">
+					<button class="ScenarioItem custom-button">Tiếp khách</button>
+					<button class="ScenarioItem custom-button">Không có người</button>
+					<button class="ScenarioItem custom-button">Phòng đông người</button>
+				</div>
+			</div>
+			<div id="SceneContainer">
+				<!-- <a-scene scene_init stats shadow="type: pcfsoft" inspector-plugin-recast > -->
+				<!-- <a-scene scene_init stats shadow="type: pcfsoft" embedded> -->
+				<a-scene scene_init embedded shadow="type: pcfsoft; autoUpdate: false;">
+					<a-assets>
+						<a-asset-item id="walkMesh" src="resources/model/study-room-01/nav-mesh-livingroom-01.gltf"></a-asset-item>
+						<img id="skysphere_seashore" src="resources/textures/Above_the_sea.jpg"/>
+						<img id="seemless_wall" src="resources/textures/seamless-wall-white.jpg"/>
+						<a-mixin id="wall" material="roughness: 1.0;" shadow="cast: false"></a-mixin>
+						<a-asset-item id="roomBox" src="resources/model/study-room-01/LivingRoom-01(packed).gltf" update-shadowmap-when-loaded></a-asset-item>
+					</a-assets>
+
+					<a-sky id="sky" src="#skysphere_seashore" ></a-sky>
+					<a-entity id="walkMesh" gltf-model="#walkMesh" nav-mesh visible="false"></a-entity>
+					<a-entity id="rig" movement-controls="constrainToNavMesh: true">
+						<a-entity camera position="0 1.2 0" look-controls="pointerLockEnabled: true">
+							<a-cursor position="0 0 -0.1" scale="0.1 0.1 0.1" raycaster="objects: .gaze-listener"></a-cursor>
+							<!-- <a-entity position="-0.2 -0.2 -0.2" laser-controls="hand: left" raycaster="objects: .laser-listener; showLine: true; far: 2" line="color: red; opacity: 0.75" ex-keyboard-controls="enabled: false"></a-entity> -->
+						</a-entity>
+						<!-- <a-entity hand-controls="hand: left" ex-keyboard-controls="enabled: false" control-laser-by-keyboard></a-entity> -->
+					</a-entity>
+					<!-- <a-sphere id="raycast-intersection-point" radius="0.1"></a-sphere> -->
+
+					<!-- room wall -->
+					<a-entity gltf-model="#roomBox" position="0 0 0" shadow update-shadowmap-when-loaded></a-entity>
+
+					<!-- light -->
+					<a-entity light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
+					<a-entity light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 50; shadowRadius: 0; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10;" position="0 10 10" rotation="0 0 0" target="#directionaltarget" update-shadowmap-on-change-prop shadow update-shadowmap-when-loaded></a-entity>
+					<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
+					<a-entity light="type: point" rotation="90 0 0" visible="" position="0 1.2 2.5"></a-entity>
+				</a-scene>
+			</div>
+		</div>
+		<div id="ListScene">
+			<h2 id="ListSceneTitle">Danh sách các phòng:</h2>
+			<div id="ListSceneItem">
+				<a href="SceneH_LivingRoom-with_control.html" class="SceneItem custom-button">Phòng khách</a>
+				<a href="SceneK_StudyRoom-with_control.html" class="SceneItem custom-button">Phòng học</a>
+			</div>
+		</div>
+	<!-- </div> -->
+
+	<script type="text/javascript">
+		var timeInput = document.getElementById("InputTime");
+		var timeInputSlider = document.getElementById("InputTimeSlider");
+		function setTime(time, updateScene = true){
+			if (!isNaN(time))
+			{
+				var hour = parseInt(parseInt(time) / 1000);
+				var minute = parseInt(parseInt(time-hour*1000) * 60 / 1000);
+				if (hour < 10){
+					hour = "0"+hour;
+				}
+				if (minute < 10){
+					minute = "0"+minute;
+				}
+				timeInput.value = hour + ":" + minute + ":00";
+				timeInputSlider.value = time;
+			}else if (time.match(/^\d{1,2}(:\d{1,2}){1,2}$/)){
+				timeInput.value = time;
+				let time_splitted = time.split(":", 3);
+				timeInputSlider.value = parseInt(time_splitted[0])*1000+parseInt(time_splitted[1])*1000/60;
+			}
+		}
+
+		var scene = document.querySelector('a-scene');
+
+		if (scene.hasLoaded) {
+		  run();
+		} else {
+		  scene.addEventListener('loaded', run);
+		}
+
+		function run () {
+		  
+		}
+	</script>
+
+	<script type="text/javascript">
+		document.onkeyup = function(e) {
+		  if (e.ctrlKey && e.shiftKey && e.which == 83) {
+		    var img = document.querySelector('a-scene').components.screenshot.getCanvas('equirectangular').toDataURL("image/png");
+    		document.write('<img src="'+img+'"/>');
+		  }
+		};
+	</script>
+</body>
+</html>
