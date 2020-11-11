@@ -1,0 +1,47 @@
+{
+	"sun": {
+		"general": {
+			"sun_distance": 10.0,
+			"sun_delta_phi": 120.0,
+			"timeline": [
+				{
+					"time": 0,
+					"angle": -90,
+					"visible": true,
+					"color": "#2e46ff"
+				},
+				{
+					"time": 4500,
+					"angle": 0,
+					"visible": true,
+					"color": "#000"
+				},
+				{
+					"time": 6000,
+					"angle": 20,
+					"visible": true,
+					"color": "#491c03"
+				},
+				{
+					"time": 12000,
+					"angle": 90,
+					"visible": true,
+					"color": "#fff4d6"
+				},
+				{
+					"time": 17000,
+					"angle": 160,
+					"visible": true,
+					"color": "#491c03"
+				},
+				{
+					"time": 19000,
+					"angle": 180,
+					"visible": true,
+					"color": "#000"
+				}
+			]
+		},
+		"summer": {}
+	}
+}

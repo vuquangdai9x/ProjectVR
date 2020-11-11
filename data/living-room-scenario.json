@@ -1,0 +1,79 @@
+{
+	"sun": {
+		"general": {
+			"id": "sunLight",
+			"sun_distance": 10.0,
+			"sun_delta_phi": 120.0,
+			"timeline": [
+				{
+					"time": 0,
+					"angle": -90,
+				},
+				{
+					"time": 4500,
+					"angle": 0,
+				},
+				{
+					"time": 12000,
+					"angle": 90,
+				},
+				{
+					"time": 19000,
+					"angle": 180,
+				}
+			]
+		},
+		"summer": {}
+	},
+	"time-scenario":{
+		"general": [
+			{
+				"id": "sunLight",
+				"timeline": [
+					{
+						"time": 0,
+						"visible": true,
+						"color": "#2e46ff",
+						"intensity": 0
+					},
+					{
+						"time": 4500,
+						"visible": true,
+						"color": "#000",
+						"intensity": 0
+					},
+					{
+						"time": 6000,
+						"visible": true,
+						"color": "#ff7300",
+						"intensity": 0.5
+					},
+					{
+						"time": 12000,
+						"visible": true,
+						"color": "#fff4d6",
+						"intensity": 2
+					},
+					{
+						"time": 17000,
+						"visible": true,
+						"color": "#ff7300",
+						"intensity": 0.5
+					},
+					{
+						"time": 19000,
+						"visible": true,
+						"color": "#000",
+						"intensity": 0
+					}
+				]
+			}
+		],
+		"summer": {},
+		"winter": {}
+	},
+
+	"custom-scenario": [
+
+	]
+}
