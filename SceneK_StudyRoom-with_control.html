@@ -65,10 +65,10 @@
 					<a-entity gltf-model="#roomBox" position="0 0 0" shadow update-shadowmap-when-loaded></a-entity>
 
 					<!-- light -->
-					<a-entity light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
+					<a-entity id="ambientLight" light="type: ambient; color: #BBB; intensity: 0.2;"></a-entity>
 					<a-entity id="sunLight" light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 50; shadowRadius: 0; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10;" position="0 10 10" rotation="0 0 0" target="#directionaltarget" update-shadowmap-on-change-prop shadow update-shadowmap-when-loaded></a-entity>
 					<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
-					<a-entity light="type: point" rotation="90 0 0" visible="" position="0 1.2 2.5"></a-entity>
+					<a-entity id="light-at-window" light="type: point" rotation="90 0 0" visible="" position="0 1.2 2.5"></a-entity>
 				</a-scene>
 			</div>
 		</div>
@@ -81,6 +81,6 @@
 		</div>
 	<!-- </div> -->
 
-	<span hidden id="scenario-file">data/living-room-scenario.json</span>
+	<span hidden id="scenario-file">data/study-room-scenario.json</span>
 </body>
 </html>

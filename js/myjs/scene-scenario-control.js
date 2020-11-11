@@ -9,7 +9,6 @@ window.onload = function(){
 	scene = document.querySelector('a-scene');
 	readJSONFile(document.getElementById("scenario-file").innerHTML, function(text){
 		time_scenario = JSON.parse(text);
-		console.log(time_scenario);
 	});
 }
 
@@ -33,7 +32,6 @@ function lerpColor(a, b, amount) {
 		rr = ar + amount * (br - ar),
 		rg = ag + amount * (bg - ag),
 		rb = ab + amount * (bb - ab);
-	console.log('#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1));
 	return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
 }
 
