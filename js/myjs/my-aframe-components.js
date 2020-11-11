@@ -24,24 +24,30 @@ AFRAME.registerComponent('update-shadowmap-on-change-prop', {
 AFRAME.registerComponent('click-to-toggle-light', {
 	schema: {
 		lightOn: {type: 'boolean', default: true},
-		targetLight: {type: 'selector'},
-		colorWhenLightOn: {type: 'color', default: '#fff'},
-		colorWhenLightOff: {type: 'color', default: '#777'}
+		targetLight: {type: 'selectorAll'},
 	},
 	init: function () {
 		var _self = this;
 		let isLightOn = this.data.lightOn;
-		this.data.targetLight.setAttribute("visible", isLightOn);
+		console.log(this.data.targetLight.length);
+		for (var i = 0; i < this.data.targetLight.length; i++) {
+			this.data.targetLight[i].setAttribute("visible", isLightOn);
+		}
 		_self.el.setAttribute("material", {
-			'color': (isLightOn?_self.data.colorWhenLightOn:_self.data.colorWhenLightOff)
+			'emissiveIntensity': (isLightOn?1.0:0.0)
 		});
 		this.el.addEventListener('click', function () {
-			let isLightOn = !_self.data.lightOn;
-			_self.data.lightOn = isLightOn;
-			_self.data.targetLight.setAttribute("visible", isLightOn);
-			_self.el.setAttribute("material", {
-				'color': (isLightOn?_self.data.colorWhenLightOn:_self.data.colorWhenLightOff)
-			});
+			_self.toggleLight();
 		});
 	},
+	toggleLight: function() {
+		let isLightOn = !this.data.lightOn;
+		this.data.lightOn = isLightOn;
+		for (var i = 0; i < this.data.targetLight.length; i++) {
+			this.data.targetLight[i].setAttribute("visible", isLightOn);
+		}
+		this.el.setAttribute("material", {
+			'emissiveIntensity': (isLightOn?1.0:0.0)
+		});
+	}
 });

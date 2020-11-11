@@ -74,18 +74,20 @@
 					<a-entity id="sunLight" light="type: directional; castShadow: true; shadowBias: -0.001; shadowCameraFar: 100; shadowRadius: 1; shadowCameraTop: 10; shadowCameraRight: 10; shadowCameraBottom: -10; shadowCameraLeft: -10; color: #e5935d;" position="-8 2.15 -4" rotation="0 0 0" target="#directionaltarget" update-shadowmap-on-change-prop shadow update-shadowmap-when-loaded></a-entity>
 					<a-entity id="directionaltarget" position="0 0 0" visible="false"></a-entity>
 
-					<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="0 1.5 1.43097" material="flatShading: true; shader: flat;">
+					<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="0 1.5 1.43097" material="color: #815f4b">
 						<a-entity text="color: white; align: center; font: roboto; value: Study Room; width: 5" position="0 1.25 -0.025" rotation="0 180 0"></a-entity>
-						<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneK_StudyRoom-with_control.html; title: Study Room; image: #study-room-360;" material="shader: portal; pano: #study-room-360; side: back"></a-entity>
+						<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneK_StudyRoom-with_control.html; title: Study Room; image: #study-room-360;" material="shader: portal; pano: #study-room-360; side: back; backgroundColor: #ffffff"></a-entity>
 					</a-entity>
 
-					<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="-2.5 1.5 1.43097" material="flatShading: true; shader: flat;">
+					<a-entity geometry="depth: 0.1; height: 2.1; width: 1.3" position="-2.5 1.5 1.43097" material="color: #815f4b">
 						<a-entity text="color: white; align: center; font: roboto; value: Living Room; width: 5" position="0 1.25 -0.025" rotation="0 180 0"></a-entity>
-						<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneH_LivingRoom-with_control.html; title: Living Room; image: #living-room-360;" material="shader: portal; pano: #living-room-360; side: back"></a-entity>
+						<a-entity position="0 0 -0.1" geometry="primitive: plane" scale="1.2 2 1" class="gaze-listener" link="href: SceneH_LivingRoom-with_control.html; title: Living Room; image: #living-room-360;" material="shader: portal; pano: #living-room-360; side: back; backgroundColor: #ffffff"></a-entity>
 					</a-entity>
 
-					<a-entity geometry="depth: 1.2; height: 0.04; width: 0.4" material="shader: flat" position="0 2.88341 -1.2752" click-to-toggle-light="lightOn: false; targetLight: #flatCeilLED;" class="gaze-listener"></a-entity>
-					<a-entity id="flatCeilLED" light="intensity: 0.5; type: point" position="0 2.65785 -1.28913"></a-entity>
+					<a-entity geometry="depth: 1.2; height: 0.04; width: 0.4" material="color: #d6d6d6; emissiveIntensity: 0; emissive: #ffffff" position="0 2.88341 -1.2752" click-to-toggle-light="lightOn: false; targetLight: .flatCeilLED" class="gaze-listener"></a-entity>
+
+					<a-entity class="flatCeilLED" light="intensity: 0.5; type: point" position="0 2.65785 -1.7"></a-entity>
+					<a-entity class="flatCeilLED" light="intensity: 0.5; type: point" position="0 2.65785 -0.7"></a-entity>
 
 					<a-entity id="light-at-door" light="intensity: 0.2; type: point" position="2.6238 2 7.29303"></a-entity>
 					<a-entity id="light-at-window-1" light="intensity: 0.2; type: point" position="-1.13582 1.55856 -6.13295" visible="false"></a-entity>
@@ -102,6 +104,6 @@
 		</div>
 	<!-- </div> -->
 
-	<span hidden id="scenario-file">data/living-room-scenario - Copy.json</span>
+	<span hidden id="scenario-file">data/living-room-scenario.json</span>
 </body>
 </html>
