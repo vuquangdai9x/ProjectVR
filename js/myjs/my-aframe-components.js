@@ -2,11 +2,11 @@ AFRAME.registerComponent('update-shadowmap-when-loaded', {
 	init: function () {
 		var _self = this;
 		this.el.addEventListener('loaded', function () {
-			console.log("loaded");
+			// console.log("loaded");
 			_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
 		});
 		this.el.addEventListener('model-loaded', function () {
-			console.log("model-loaded");
+			// console.log("model-loaded");
 			_self.el.sceneEl.renderer.shadowMap.needsUpdate = true;
 		});
 	},
@@ -29,7 +29,7 @@ AFRAME.registerComponent('click-to-toggle-light', {
 	init: function () {
 		var _self = this;
 		let isLightOn = this.data.lightOn;
-		console.log(this.data.targetLight.length);
+		// console.log(this.data.targetLight.length);
 		for (var i = 0; i < this.data.targetLight.length; i++) {
 			this.data.targetLight[i].setAttribute("visible", isLightOn);
 		}

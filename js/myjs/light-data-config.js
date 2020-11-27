@@ -12,13 +12,27 @@ function readJSONFile(file, callback) {
 	rawFile.send(null);
 }
 
-function standardizeLightPropJson(){
-	// for (let i=0; i<scenario_data.light_prop.config.length; i++){
+function fillDefaultObjectData(object, defaultObj){
+	Object.keys(defaultObj).forEach(function(key) {
+		if (object[key]==undefined || object[key]==null){
+			object[key] = defaultObj[key];
+		}else if (object.constructor === ({}).constructor){
+			fillDefaultObjectData(object[key], defaultObj[key]);
+		}else{
+			// do nothing
+		}	
+	})
+}
 
-	// }
+function standardizeLightPropJson(){
+	for (let i=0; i<scenario_data.light_prop.config.length; i++){
+		fillDefaultObjectData(scenario_data.light_prop.config[i], scenario_data.light_prop.default);
+	}
 }
 function standardizeScenarioJson(){
-	
+	for (let i=0; i<scenario_data.scenario.scenario.length; i++){
+		fillDefaultObjectData(scenario_data.scenario.scenario[i], scenario_data.scenario["default-scenario"]);
+	}
 }
 
 function loadScenarioData(sceneEl, scenarioDataEl, onloadedCallback){
@@ -29,7 +43,7 @@ function loadScenarioData(sceneEl, scenarioDataEl, onloadedCallback){
 		scenario_data.light_prop = light_prop;
 		standardizeLightPropJson();
 		if (scenario != undefined){
-			initScenarioData(scenario_data, sceneEl, onloadedCallback);
+			initScenarioData(sceneEl, onloadedCallback);
 		}
 	});
 	readJSONFile(document.getElementById("scenario-file").getAttribute("data-scenario"), function(text){
@@ -37,7 +51,7 @@ function loadScenarioData(sceneEl, scenarioDataEl, onloadedCallback){
 		scenario_data.scenario = scenario;
 		standardizeScenarioJson();
 		if (light_prop != undefined){
-			initScenarioData(scenario_data, sceneEl, onloadedCallback);
+			initScenarioData(sceneEl, onloadedCallback);
 		}
 	});
 }
@@ -53,7 +67,7 @@ const ColorMode = {
     RGB: 2,
 }
 
-function initScenarioData(scenario_data, sceneEl, onloadedCallback){
+function initScenarioData(sceneEl, onloadedCallback){
 	let list_light_config = [];
 
 	// init light data
@@ -89,24 +103,24 @@ function initScenarioData(scenario_data, sceneEl, onloadedCallback){
 				value_time: 0.5
 			},
 			color: {
-				modifyLevel: ModifyLevel.TIME,
+				modifyLevel: ModifyLevel.LIGHT_CONFIG,
 				value_config: {
 					color_mode: ColorMode.TEMPERATURE,
-					temperature: 6000,
+					temperature: 3000,
 					rgb_preset_index: 0,
 					rgb_color: "#ffffff"
 				},
 				value_scenario: {
 					color_mode: ColorMode.RGB_PRESET,
 					temperature: 6000,
-					rgb_preset_index: 0,
+					rgb_preset_index: 2,
 					rgb_color: "#ffffff"
 				},
 				value_time: {
 					color_mode: ColorMode.RGB,
 					temperature: 6000,
 					rgb_preset_index: 0,
-					rgb_color: "#ffffff"
+					rgb_color: "#ff0000"
 				},
 			},
 		};
@@ -169,16 +183,16 @@ function GetLightColor(light_index){
 	return value;
 }
 
-function SetTime(time){
+function SetTime(time, onfinishCallback=null){
+	
+}
+function SetScenario(scenario_index, onfinishCallback=null){
 
 }
-function SetScenario(scenario_index){
+function SetLightModifyLevel(index, modifyLevel, onfinishCallback=null){
 
 }
-function SetLightModifyLevel(index, modifyLevel){
-
-}
-function SetLightStatus(index, isLightOn){
+function SetLightStatus(index, isLightOn, onfinishCallback=null){
 	let light_data = scenario_data.list_light_config[index];
 	for (let i=0; i<light_data.list_light_group.length; i++){
 		for (var j = 0; j < light_data.list_light_group[i].length; j++) {
@@ -191,15 +205,15 @@ function SetLightStatus(index, isLightOn){
 		}
 	}
 }
-function SetAllLightStatus(scenario_data, isLightOn){
+function SetAllLightStatus(scenario_data, isLightOn, onfinishCallback=null){
 
 }
-function SetLightPower(scenario_data, index, power){
+function SetLightPower(scenario_data, index, power, onfinishCallback=null){
 
 }
-function SetLightTemperature(scenario_data, index, temperature){
+function SetLightTemperature(scenario_data, index, temperature, onfinishCallback=null){
 
 }
-function SetLightColor(scenario_data, index, color){
+function SetLightColor(scenario_data, index, color, onfinishCallback=null){
 	
 }

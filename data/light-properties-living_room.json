@@ -1,5 +1,9 @@
 {
 	"default":{
+		"name": "",
+		"description": "",
+		"list-light-query": [],
+		"list-object-query": [],
 		"img": "resources/img/lightbulb.jpg",
 		"power":{
 			"min":{
@@ -29,7 +33,41 @@
 					"config-emissive-color-all": 6000
 				}
 			},
-			"list-rgb": ["#ffffff","#ff0000","#00ff00","#0000ff","#ff00ff","#ffff00","#00ffff"]
+			"list-rgb": []
+		}			
+	},
+	"default-natual-light":{
+		"name": "",
+		"list-light-query": [],
+		"list-object-query": [],
+		"power":{
+			"min":{
+				"value": 0.0,
+				"config-intensity-all": 0.0,
+				"config-emissive-intensity-all": 0.0
+			},
+			"max":{
+				"value": 1.0,
+				"config-intensity-all": 1.0,
+				"config-emissive-intensity-all": 1.0
+			}
+		},
+		"color":{
+			"use-temperature": true,
+			"use-rgb": true,
+			"temperature":{
+				"min":{
+					"value": 2000,
+					"config-temperature-all": 2000,
+					"config-emissive-color-all": 2000
+				},
+				"max":{
+					"value": 6000,
+					"config-intensity-all": 6000,
+					"config-emissive-color-all": 6000
+				}
+			},
+			"list-rgb": []
 		}			
 	},
 	"config":[
@@ -38,7 +76,6 @@
 			"description": "Lorem ipsum...",
 			"list-light-query": [".flatCeilLED"],
 			"list-object-query": ["#flatCeilLEDObj"],
-			
 			"img": "resources/img/compact-ut4-11w.jpg",
 			"power": {
 				"min":{
@@ -77,9 +114,46 @@
 			},
 			"color":{
 				"use-temperature": false,
-				"use-rgb": false,
-				"allow-select-rgb": false
+				"use-rgb": true,
+				"allow-select-rgb": false,
+				"list-rgb": ["#ffffff","#ff0000","#00ff00","#0000ff","#ff00ff","#ffff00","#00ffff"]
 			}	
+		}
+	],
+	"natural-light":[
+		{
+			"name": "SunLight",
+			"list-light-query": ["#sunLight"],
+			"list-object-query": [],
+			"power":{
+				"min":{
+					"value": 0.0,
+					"config-intensity-all": 0.0,
+					"config-emissive-intensity-all": 0.0
+				},
+				"max":{
+					"value": 1.0,
+					"config-intensity-all": 1.0,
+					"config-emissive-intensity-all": 1.0
+				}
+			},
+			"color":{
+				"use-temperature": true,
+				"use-rgb": true,
+				"temperature":{
+					"min":{
+						"value": 2000,
+						"config-temperature-all": 2000,
+						"config-emissive-color-all": 2000
+					},
+					"max":{
+						"value": 6000,
+						"config-intensity-all": 6000,
+						"config-emissive-color-all": 6000
+					}
+				},
+				"list-rgb": []
+			}			
 		}
 	]
 }

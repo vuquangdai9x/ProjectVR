@@ -1,5 +1,10 @@
 {
 	"default":{
+		"name": "",
+		"description": "",
+		"list-light-query": [],
+		"list-object-query": [],
+		"img": "resources/img/lightbulb.jpg",
 		"power":{
 			"min":{
 				"value": 0.0,
@@ -28,7 +33,7 @@
 					"config-emissive-color-all": 6000
 				}
 			},
-			"list-rgb": ["#ffffff","#ff0000","#00ff00","#0000ff","#ff00ff","#ffff00","#00ffff"]
+			"list-rgb": []
 		}			
 	},
 	"config":[]

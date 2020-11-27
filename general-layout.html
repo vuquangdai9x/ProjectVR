@@ -62,7 +62,7 @@
 					<div id="light-color-preview" style="background-color: #ffffff"></div>
 				</div>
 				<div id="config-light-temperature">
-					<input type="range" style="background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 45%, rgba(0,212,255,1) 100%);">
+					<input type="range" step="1">
 				</div>
 				<div id="config-light-color-rgb">
 					<label>
@@ -81,22 +81,19 @@
 		<div id="config-time">
 			<h2>Thời gian</h2>
 			<div id="list-time-items">
-				<button onclick="setTime(7500)">Sáng</button>
-				<button onclick="setTime(12000)">Trưa</button>
-				<button onclick="setTime(15000)">Chiều</button>
-				<button onclick="setTime(20000)">Tối</button>
+				<button onclick="UI_selectTime(7500)">Sáng</button>
+				<button onclick="UI_selectTime(12000)">Trưa</button>
+				<button onclick="UI_selectTime(15000)">Chiều</button>
+				<button onclick="UI_selectTime(20000)">Tối</button>
 			</div>
 			<div id="input-time">
-				<input type="time" name="time-info" class="custom-button" onchange="setTime(this.value)">
-				<button>Thời điểm hiện tại</button>
+				<input type="time" name="time-info" class="custom-button" onchange="UI_selectTime(this.value)">
+				<button onclick="UI_selectCurrentTime()">Thời điểm hiện tại</button>
 			</div>
 			<div id="input-time-slider">
-				<input type="range" name="time-info-range"  min="1" max="23999" class="custom-button" onchange="setTime(this.value)" oninput="setTime(this.value, true)">
+				<input type="range" name="time-info-range"  min="1" max="23999" step="1" class="custom-button" onchange="UI_selectTime(this.value)" oninput="UI_selectTime(this.value)">
 			</div>
-			<p id="time-description">
-				16h00: đèn sáng 30% <br>
-				17h00: tắt hết đèn
-			</p>
+			<p id="time-description"></p>
 		</div>
 	</aside>
 	<main id="main-section">
