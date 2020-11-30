@@ -116,19 +116,13 @@
             "timeline":[
                 {
                     "time":0,
-                    "angle":-90
-                },
-                {
-                    "time":4500,
-                    "angle":0
+                    "angle":-90,
+                    "clockwise":false
                 },
                 {
                     "time":12000,
-                    "angle":90
-                },
-                {
-                    "time":19000,
-                    "angle":180
+                    "angle":90,
+                    "clockwise":false
                 }
             ]
         },
@@ -153,30 +147,34 @@
                         "time":0,
                         "turnOn":true,
                         "power":1.0,
+                        "color-type": "preset",
                         "color-temperature":345,
-                        "color-rgb":""
+                        "color-preset-index":0,
+                        "color-rgb":"#ffffff"
                     },
                     {
                         "time":12000,
                         "turnOn":true,
                         "power":1.0,
+                        "color-type": "temperature",
                         "color-temperature":345,
-                        "color-rgb":""
+                        "color-preset-index":1,
+                        "color-rgb":"#ffffff"
                     }
                 ]
             }
         ],
         "other-objects":[
             {
-                "query":"#wooden_window1",
+                "id":"#test-obj-animate_",
                 "timeline":[
                     {
                         "time":0,
                         "visible":true,
                         "position":{
-                            "x":1,
-                            "y":1,
-                            "z":1
+                            "x":-3.93082,
+                            "y":1.663,
+                            "z":-3.53577
                         },
                         "rotation":{
                             "x":0,
@@ -191,11 +189,11 @@
                     },
                     {
                         "time":12000,
-                        "visible":true,
+                        "visible":false,
                         "position":{
-                            "x":1,
-                            "y":1,
-                            "z":1
+                            "x":-8.93082,
+                            "y":1.663,
+                            "z":-3.53577
                         },
                         "rotation":{
                             "x":0,

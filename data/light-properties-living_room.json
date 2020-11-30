@@ -92,7 +92,8 @@
 			"color":{
 				"use-temperature": true,
 				"use-rgb": false,
-				"allow-select-rgb": false
+				"allow-select-rgb": false,
+				"list-rgb": ["#ffffff","#ff0000","#00ff00","#0000ff","#ff00ff","#ffff00","#00ffff"]
 			}	
 		},
 		{

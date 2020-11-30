@@ -241,5 +241,5 @@ function UI_previewLight(index){
 }
 
 function turnOffAllLights(){
-
+	
 }
