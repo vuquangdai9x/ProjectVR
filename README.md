@@ -36,3 +36,34 @@
 	1. Thông số do người dùng tùy chỉnh
 	2. Kịch bản xây dựng sẵn
 	3. Kịch bản theo thời gian
+
+## Technical design
+* Các object lớn: 
+	* `ScenarioData`: Lưu trữ dữ liệu
+		- Cấu trúc:
+			- **light_definition**: chứa thông tin về cấu hình các loại ánh sáng
+				- **list_lights**: Cấu hình các loại đèn, có thể tùy chỉnh bởi người dùng.
+				- **list_natural_lights**: Cấu hình các loại ánh sáng tự nhiên (sun light, ambient light,...). Chỉ có thể điều chỉnh thông các kịch bản hoặc tùy thuộc vào thời gian. Người dùng không thể điều chỉnh loại ánh sáng này trực tiếp.
+			- **scenario**: chứa thông tin về các kịch bản
+			- **timeline**: chứa cấu hình tùy thuộc theo thời gian
+			- **light_data**: chứa thông tin hiện tại về các loại ánh sáng. Có thể thay đổi.
+				- **list_lights**: thông tin hiện tại của các loại đèn
+				- **list_natural_lights**: thông tin hiện tại của các loại ánh sáng tự nhiên
+	* `DataManager`: Xử lý các tác vụ liên quan đến dữ liệu. Đây là đối tượng duy nhất được quyền chỉnh sửa `ScenarioData.light_current_data`
+		- Chức năng: 
+			- Khởi tạo dữ liệu trong `ScenarioData`
+				- Đọc dữ liệu json từ các file `light-properties-*.json`, `scenario-*.json`
+				- Chuẩn hóa dữ liệu: lấp đầy các phần khai báo còn thiếu bằng dữ liệu mặc định
+			- Cập nhật `ScenarioData.light_current_data` dựa vào các thiết lập trong `ScenarioData.light_static_data`, `ScenarioData.scenario`, `ScenarioData.timeline`, khi xảy ra các sự kiện (thời gian thay đổi, chọn kịch bản khác, người dùng tùy chỉnh thông số của đèn)
+	* `SceneManager`: Đọc dữ liệu từ `ScenarioData.light_current_data` để thay đổi trạng thái của scene
+	* `UIManager`: Quản lý việc tương tác giao diện người dùng
+		- Chức năng:
+			- Sinh ra giao diện từ file kịch bản
+			- Xử lý sự kiện khi người dùng tương tác
+			- Kiểm tra, chuẩn hóa đầu vào
+			- Gọi đến phần xử lý tương ứng trong `DataManager`
+			- Thay đổi giao diện
+		- Lưu ý:
+			- UIManager chỉ đọc dữ liệu, không tương tác gì với dữ liệu
+
+
