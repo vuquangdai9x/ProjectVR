@@ -8,8 +8,47 @@ function lerpColor(a, b, amount) {
 		rb = ab + amount * (bb - ab);
 	return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
 };
-function lerpFloat(a, b, amount) {
-	return (a+(b-a)*amount);
+function lerpFloat(a, b, amount, clamp=true) {
+	let result = a+(b-a)*amount;
+	if (clamp){
+		if (a < b){
+			if (result < a) result=a;
+			else if (result > b) result=b;
+		}else{
+			if (result < b) result=b;
+			else if (result > a) result=a;
+		}
+	}
+	return result;
+};
+function lerpVector3(a, b, amount, clamp=true) {
+	let result = {
+		x: lerpFloat(a.x, b.x, amount, clamp),
+		y: lerpFloat(a.y, b.y, amount, clamp),
+		z: lerpFloat(a.z, b.z, amount, clamp),
+	}
+	return result;
+};
+function getTimeStringFromValue(int_value, display_type = 0){
+	let hour = parseInt(int_value / 1000);
+	let minute = parseInt((int_value - hour*1000) * 60 / 1000);
+
+	let time_string = "";
+	switch (display_type) {
+		case 0:
+			if (minute == 0){
+				time_string = hour + "h";
+			}else{
+				time_string = hour + "h" + minute;
+			}
+			break;
+		case 1:
+			if (hour < 10) hour = "0"+hour;
+			if (minute < 10) minute = "0"+minute;
+			time_string = hour + ":" + minute + ":00";
+			break;
+	}
+	return time_string;
 };
 var temperature_color_map = [
 		{

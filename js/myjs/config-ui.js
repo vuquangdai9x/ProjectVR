@@ -11,7 +11,7 @@ var listLightImgUI, listScenarioImgUI,
 	timeInputSliderUI, timeInputUI, timeDescriptionUI;
 
 function UI_mappingUI(){
-	listLightImgUI = document.querySelector("#list-light-group > div");
+	listLightImgUI = document.querySelector("#list-light-group > div"); //
 	listScenarioImgUI = document.querySelector("#list-scenario");
 	scenarioNameUI = document.querySelector("#config-scenario > h3");
 	scenarioDescriptionUI = document.querySelector("#config-scenario > p");

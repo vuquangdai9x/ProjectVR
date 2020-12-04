@@ -132,7 +132,6 @@ function initScenarioData(sceneEl, onloadedCallback){
 	scenario_data.scene_el = sceneEl;
 
 	// setup
-
 	onloadedCallback(scenario_data);
 }
 
@@ -431,6 +430,9 @@ function UpdateAllLightInScene(){
 	for (let i=0; i<scenario_data.list_light_config.length; i++){
 		UpdateLightInScene(i);
 	}
+	for (let i=0; i<scenario_data.list_light_config.length; i++){
+		UpdateLightInScene(i);
+	}
 }
 
 function UpdateLightInScene(index){
@@ -481,14 +483,13 @@ function UpdateLightInScene(index){
 			let intensity = lerpFloat(lightStaticData.power.min["config-intensity-all"],lightStaticData.power.max["config-intensity-all"],lerpPowerValue);
 			lightEntity.setAttribute('light', { 'intensity': intensity });
 
-			let temperatureValue;
 			let lerpTemperatureValue;
 			let temperature;
 			switch (colorValue.color_mode) {
 				case ColorMode.TEMPERATURE:
-					lerpTemperatureValue = (temperatureValue-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
+					lerpTemperatureValue = (colorValue.temperature-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
 					temperature = lerpFloat(lightStaticData.color.temperature.min["config-temperature-all"],lightStaticData.color.temperature.max["config-temperature-all"],lerpTemperatureValue);
-					lightEntity.setAttribute('light-temperature', temperature);
+					lightEntity.setAttribute("light-temperature", "temperature", temperature);
 					break;
 				case ColorMode.RGB_PRESET:
 					lightEntity.setAttribute('light', { 'color': lightStaticData.color["list-rgb"][colorValue.rgb_preset_index] });
@@ -506,14 +507,104 @@ function UpdateLightInScene(index){
 			let intensity = lerpFloat(lightStaticData.power.min["config-emissive-intensity-all"],lightStaticData.power.max["config-emissive-intensity-all"],lerpPowerValue);
 			objEntity.setAttribute('material', { 'emissiveIntensity': intensity });
 
-			let temperatureValue;
 			let lerpTemperatureValue;
 			let temperature;
 			switch (colorValue.color_mode) {
 				case ColorMode.TEMPERATURE:
-					lerpTemperatureValue = (temperatureValue-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
+					lerpTemperatureValue = (colorValue.temperature-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
 					temperature = lerpFloat(lightStaticData.color.temperature.min["config-emissive-color-all"],lightStaticData.color.temperature.max["config-emissive-color-all"],lerpTemperatureValue);
-					objEntity.setAttribute('emissive-temperature', temperature);
+					objEntity.setAttribute("emissive-temperature", "temperature", temperature);
+					break;
+				case ColorMode.RGB_PRESET:
+					objEntity.setAttribute('material', { 'emissive': lightStaticData.color["list-rgb"][colorValue.rgb_preset_index] });
+					break;
+				case ColorMode.RGB:
+					objEntity.setAttribute('material', { 'emissive': colorValue.rgb_color });
+					break;
+			}
+		}
+	}
+}
+
+function UpdateNaturalLightInScene(index){
+	let lightStaticData = scenario_data.light_prop.config[index];
+	let lightData = scenario_data.list_light_config[index];
+
+	let isTurnOn, powerValue, colorValue;
+	switch (lightData.isLightOn.modifyLevel) {
+		case ModifyLevel.LIGHT_CONFIG:
+			isTurnOn = lightData.isLightOn.value_config;
+			break;
+		case ModifyLevel.SCENARIO:
+			isTurnOn = lightData.isLightOn.value_scenario;
+			break;
+		case ModifyLevel.TIME:
+			isTurnOn = lightData.isLightOn.value_time;
+			break;
+	}
+	switch (lightData.power.modifyLevel) {
+		case ModifyLevel.LIGHT_CONFIG:
+			powerValue = lightData.power.value_config;
+			break;
+		case ModifyLevel.SCENARIO:
+			powerValue = lightData.power.value_scenario;
+			break;
+		case ModifyLevel.TIME:
+			powerValue = lightData.power.value_time;
+			break;
+	}
+	switch (lightData.color.modifyLevel) {
+		case ModifyLevel.LIGHT_CONFIG:
+			colorValue = lightData.color.value_config;
+			break;
+		case ModifyLevel.SCENARIO:
+			colorValue = lightData.color.value_scenario;
+			break;
+		case ModifyLevel.TIME:
+			colorValue = lightData.color.value_time;
+			break;
+	}
+
+	for (let i=0; i<lightData.list_light.length; i++){
+		for (let j=0; j<lightData.list_light[i].length; j++){
+			let lightEntity = lightData.list_light[i][j];
+			lightEntity.setAttribute("visible", isTurnOn);
+
+			let lerpPowerValue = (powerValue-lightStaticData.power.min.value)/(lightStaticData.power.max.value-lightStaticData.power.min.value);
+			let intensity = lerpFloat(lightStaticData.power.min["config-intensity-all"],lightStaticData.power.max["config-intensity-all"],lerpPowerValue);
+			lightEntity.setAttribute('light', { 'intensity': intensity });
+
+			let lerpTemperatureValue;
+			let temperature;
+			switch (colorValue.color_mode) {
+				case ColorMode.TEMPERATURE:
+					lerpTemperatureValue = (colorValue.temperature-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
+					temperature = lerpFloat(lightStaticData.color.temperature.min["config-temperature-all"],lightStaticData.color.temperature.max["config-temperature-all"],lerpTemperatureValue);
+					lightEntity.setAttribute("light-temperature", "temperature", temperature);
+					break;
+				case ColorMode.RGB_PRESET:
+					lightEntity.setAttribute('light', { 'color': lightStaticData.color["list-rgb"][colorValue.rgb_preset_index] });
+					break;
+				case ColorMode.RGB:
+					lightEntity.setAttribute('light', { 'color': colorValue.rgb_color });
+					break;
+			}
+		}
+	}
+	for (let i=0; i<lightData.list_object.length; i++){
+		for (let j=0; j<lightData.list_object[i].length; j++){
+			let objEntity = lightData.list_object[i][j];
+			let lerpPowerValue = (powerValue-lightStaticData.power.min.value)/(lightStaticData.power.max.value-lightStaticData.power.min.value);
+			let intensity = lerpFloat(lightStaticData.power.min["config-emissive-intensity-all"],lightStaticData.power.max["config-emissive-intensity-all"],lerpPowerValue);
+			objEntity.setAttribute('material', { 'emissiveIntensity': intensity });
+
+			let lerpTemperatureValue;
+			let temperature;
+			switch (colorValue.color_mode) {
+				case ColorMode.TEMPERATURE:
+					lerpTemperatureValue = (colorValue.temperature-lightStaticData.color.temperature.min.value)/(lightStaticData.color.temperature.max.value-lightStaticData.color.temperature.min.value);
+					temperature = lerpFloat(lightStaticData.color.temperature.min["config-emissive-color-all"],lightStaticData.color.temperature.max["config-emissive-color-all"],lerpTemperatureValue);
+					objEntity.setAttribute("emissive-temperature", "temperature", temperature);
 					break;
 				case ColorMode.RGB_PRESET:
 					objEntity.setAttribute('material', { 'emissive': lightStaticData.color["list-rgb"][colorValue.rgb_preset_index] });
