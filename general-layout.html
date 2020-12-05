@@ -17,16 +17,13 @@
 	<script src="https://kit.fontawesome.com/d800649acc.js" crossorigin="anonymous"></script>
 
 	<link rel="stylesheet" href="css/general-layout.css">
-	<script type="text/javascript" defer src="js/myjs/ultility-functions.js"></script>
-
-	<!-- <script type="text/javascript" defer src="js/myjs/light-data-config.js"></script>
-	<script type="text/javascript" defer src="js/myjs/config-ui.js"></script> -->
-
+	
+	<script type="text/javascript" defer src="js/scenario-manager/ultility-functions.js"></script>
 	<script type="text/javascript" defer src="js/scenario-manager/DataManager.js"></script>
 	<script type="text/javascript" defer src="js/scenario-manager/SceneManager.js"></script>
 	<script type="text/javascript" defer src="js/scenario-manager/UIManager.js"></script>
 
-	<script type="module" src="js/myjs/my-aframe-components.js"></script>
+	<script type="module" src="js/my-aframe-components.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
@@ -68,7 +65,7 @@
 					<div id="light-color-preview" style="background-color: #ffffff"></div>
 				</div>
 				<div id="config-light-temperature">
-					<input type="range" step="1">
+					<input type="range" step="1" onchange="UIManager.setLightTemperature(this.value)" oninput="UIManager.setLightTemperature(this.value)">
 				</div>
 				<div id="config-light-color-rgb">
 					<label>
@@ -173,17 +170,21 @@
 
 	<script type="text/javascript">
 		function onloadedScenarioData(data){
-			SceneManager.sceneEl = document.querySelector('a-scene');
-			SceneManager.queryEntitiesInScene();
+			SceneManager.queryEntitiesInScene(document.querySelector('a-scene'));
 			UIManager.initUI();
 			console.log(ScenarioData);
-			console.log(SceneManager);
+			console.log(UIManager);
+			console.log(SceneManager.entities);
+		}
+
+		function onerrorScenarioData(){
+			console.error("Can\'t load scenario data files");
 		}
 
 		window.onload = (event) => {
 			let dataEl = document.querySelector('#scenario-file');
 			// loadScenarioData(sceneEl, dataEl, onloadedScenarioData);
-			DataManager.loadDataFiles(dataEl, onloadedScenarioData);
+			DataManager.loadDataFiles(dataEl, onloadedScenarioData, onerrorScenarioData);
 		};
 	</script>
 </body>

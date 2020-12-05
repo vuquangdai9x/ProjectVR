@@ -12,10 +12,70 @@ const ColorMode = {
 
 var ScenarioData = {
 	// sceneEl: null,
-	light_definition: [],
+	light_definition: null,
 	scenario: null,
 	timeline: null,
-	light_data: [],
+	light_data: [
+		{
+			isLightOn: {
+				modifyLevel: ModifyLevel.TIME,
+				value_config: true,
+				value_scenario: true,
+				value_time: true
+			},
+			power: {
+				modifyLevel: ModifyLevel.TIME,
+				value_config: {
+					value: 1.0,
+					intensity_all: 1.0,
+					emissive_intensity_all: 1.0
+				},
+				value_scenario: {
+					value: 1.0,
+					intensity_all: 1.0,
+					emissive_intensity_all: 1.0
+				},
+				value_time: {
+					value: 1.0,
+					intensity_all: 1.0,
+					emissive_intensity_all: 1.0
+				},
+			},
+			color: {
+				modifyLevel: ModifyLevel.TIME,
+				value_config: {
+					color_mode: ColorMode.RGB,
+					temperature: {
+						value: 4000,
+						temperature_all: 4000,
+						emissive_temperature_all: 4000
+					},
+					rgb_preset_index: 0,
+					rgb_color: "#ffffff"
+				},
+				value_scenario: {
+					color_mode: ColorMode.RGB,
+					temperature: {
+						value: 4000,
+						temperature_all: 4000,
+						emissive_temperature_all: 4000
+					},
+					rgb_preset_index: 0,
+					rgb_color: "#ffffff"
+				},
+				value_time: {
+					color_mode: ColorMode.RGB,
+					temperature: {
+						value: 4000,
+						temperature_all: 4000,
+						emissive_temperature_all: 4000
+					},
+					rgb_preset_index: 0,
+					rgb_color: "#ffffff"
+				},
+			}
+		}
+	],
 	timeline_data:{
 		sun:{
 			position: {
@@ -27,7 +87,14 @@ var ScenarioData = {
 		sky:{
 			color: "#ffffff"
 		},
-		other_objects:[],
+		other_objects:[
+			{
+				visible: true,
+				position: null,
+				rotation: null,
+				scale: null
+			}
+		],
 		note: ""
 	}
 };
@@ -36,16 +103,73 @@ var DataManager = {
 	isInDefaultScenario: true,
 
 	/*
-	/ 	ultilities function
+	// 	load data
 	*/
 
-	readJSONFile: function(file, callback) {
+	loadDataFiles: function(scenarioDataEl, onloadedCallback, onerrorCallback){
+		// console.log("DataManager: start: load data files");
+		let _self = this;
+		_self.readJSONFile(scenarioDataEl.getAttribute("data-light-definition"), 
+			function(light_def_text){
+				// console.log("DataManager: finish load light-definition files: "+scenarioDataEl.getAttribute("data-light-definition"));
+				
+				_self.initLightData(light_def_text);
+				// console.log("DataManager: finish init list light definition & list light data");
+
+				_self.loadDataFiles_1(scenarioDataEl, onloadedCallback, onerrorCallback);
+			},
+			function(status_code){
+				console.error("DataManager: failed to load light-definition files ("+status_code+"): "+scenarioDataEl.getAttribute("data-light-definition"));
+				onerrorCallback();
+			}
+		);
+	},
+	loadDataFiles_1: function(scenarioDataEl, onloadedCallback, onerrorCallback){
+		let _self = this;
+		_self.readJSONFile(scenarioDataEl.getAttribute("data-scenario"), 
+			function(scenario_text){
+				// console.log("DataManager: finish load scenario files: "+scenarioDataEl.getAttribute("data-scenario"));
+				
+				_self.initScenarioData(scenario_text);
+				// console.log("DataManager: finish init list scenario");
+
+				_self.loadDataFiles_2(scenarioDataEl, onloadedCallback, onerrorCallback);
+			},
+			function(status_code){
+				console.error("DataManager: failed to load scenario files ("+status_code+"): "+scenarioDataEl.getAttribute("data-scenario"));
+				onerrorCallback();
+			},
+		);
+	},
+	loadDataFiles_2: function(scenarioDataEl, onloadedCallback, onerrorCallback){
+		let _self = this;
+		_self.readJSONFile(scenarioDataEl.getAttribute("data-timeline"), 
+			function(timeline_text){
+				// console.log("DataManager: finish load timeline files: "+scenarioDataEl.getAttribute("data-timeline"));
+				
+				_self.initTimelineData(timeline_text);
+				// console.log("DataManager: finish init timeline & timeline data");
+				
+				onloadedCallback();
+			},
+			function(status_code){
+				console.error("DataManager: failed to load timeline files ("+status_code+"): "+scenarioDataEl.getAttribute("data-timeline"));
+				onerrorCallback();
+			}
+		);
+	},
+
+	readJSONFile: function(file, callback, errorCallback=null) {
 		var rawFile = new XMLHttpRequest();
 		rawFile.overrideMimeType("application/json");
 		rawFile.open("GET", file, true);
 		rawFile.onreadystatechange = function() {
-			if (rawFile.readyState === 4 && rawFile.status == "200") {
-				callback(rawFile.responseText);
+			if (rawFile.readyState === 4) {
+				if (rawFile.status == "200"){
+					callback(rawFile.responseText);
+				}else{
+					if (errorCallback) errorCallback(rawFile.status);
+				}
 			}
 		}
 		rawFile.send(null);
@@ -63,10 +187,6 @@ var DataManager = {
 			}	
 		})
 	},
-
-	/*
-	// 	load data
-	*/
 
 	initLightData: function(text){
 		let data_json = JSON.parse(text);
@@ -167,24 +287,6 @@ var DataManager = {
 		}
 	},
 
-	loadDataFiles: function(scenarioDataEl, onloadedCallback){
-		// ScenarioData.sceneEl = sceneEl;
-		let _self = this;
-		_self.readJSONFile(scenarioDataEl.getAttribute("data-light-definition"), function(light_def_text){
-			_self.initLightData(light_def_text);
-
-			_self.readJSONFile(scenarioDataEl.getAttribute("data-scenario"), function(scenario_text){
-				_self.initScenarioData(scenario_text);
-
-				_self.readJSONFile(scenarioDataEl.getAttribute("data-timeline"), function(timeline_text){
-					_self.initTimelineData(timeline_text);
-
-					onloadedCallback();
-				});
-			});
-		});
-	},
-
 	/*
 	//	get light values
 	*/
@@ -271,8 +373,8 @@ var DataManager = {
 		);
 
 		temperature_data_block.emissive_temperature_all = lerpFloat(
-			def_block.min["config-emissive-color-all"],
-			def_block.max["config-emissive-color-all"],
+			def_block.min["config-emissive-temperature-all"],
+			def_block.max["config-emissive-temperature-all"],
 			lerpValue
 		);
 	},
@@ -280,7 +382,7 @@ var DataManager = {
 	setLightIsOnManuallyAll: function(isTurnOn){
 		for (let i=0; i<ScenarioData.light_definition.length; i++){
 			if (ScenarioData.light_definition[i]["allow_config_manually"]){
-				this.setLightIsOnManually(i, isOn);
+				this.setLightIsOnManually(i, isTurnOn);
 			}
 		}
 	},
@@ -312,6 +414,7 @@ var DataManager = {
 					colorDef.temperature,
 					value
 				);
+				light_color_data.value_config.rgb_color = getColorFromTemperature(value);
 				break;
 			case ColorMode.RGB_PRESET:
 				light_color_data.value_config.rgb_preset_index = value;
@@ -412,6 +515,7 @@ var DataManager = {
 								lightDef.color.temperature,
 								listLightInScenario[i].color["temperature"]
 							);
+							lightData.color.value_scenario.rgb_color = getColorFromTemperature(listLightInScenario[i].color["temperature"]);
 							break;
 						case "rgb-preset":
 							lightData.color.value_scenario.color_mode = ColorMode.RGB_PRESET;
@@ -572,57 +676,58 @@ var DataManager = {
 					lerpFloat(lerpResult.prev.power, lerpResult.next.power, lerpResult.lerpValue)
 				);
 				
-				if (lerpResult.prev["color-type"]==lerpResult.next["color-type"]){
-					switch (lerpResult.prev["color-type"]) {
+				if (lerpResult.prev.color["type"]==lerpResult.next.color["type"]){
+					switch (lerpResult.prev.color["type"]) {
 						case "temperature":
 							lightData.color.value_time.color_mode = ColorMode.TEMPERATURE;
-								
+							let temperatureValue = lerpFloat(
+								lerpResult.prev.color["temperature"], 
+								lerpResult.next.color["temperature"],
+								lerpResult.lerpValue
+							);
 							this.updateColorTemperatureDataBlock(
 								lightData.color.value_time.temperature,
 								lightDefinition.color.temperature,
-								lerpFloat(
-									lerpResult.prev["color-temperature"], 
-									lerpResult.next["color-temperature"],
-									lerpResult.lerpValue
-								)
+								temperatureValue
 							);
+							lightData.color.value_time.rgb_color = getColorFromTemperature(temperatureValue);
 							break;
 						case "preset":
 							lightData.color.value_time.color_mode = ColorMode.RGB_PRESET;
-							lightData.color.value_time.rgb_preset_index = lerpResult.next["color-preset-index"];
-							lightData.color.value_time.rgb_color = lightDefinition.color["list-rgb"][lerpResult.next["color-preset-index"]];
+							lightData.color.value_time.rgb_preset_index = lerpResult.next.color["preset-index"];
+							lightData.color.value_time.rgb_color = lightDefinition.color["list-rgb"][lerpResult.next.color["preset-index"]];
 							break;
 						case "rgb":
 							lightData.color.value_time.color_mode = ColorMode.RGB;
 							lightData.color.value_time.rgb_color = lerpColor(
-								lerpResult.prev["color-rgb"], 
-								lerpResult.next["color-rgb"],
+								lerpResult.prev.color["rgb"], 
+								lerpResult.next.color["rgb"],
 								lerpResult.lerpValue);
 							break;
 					}
 				}else{
 					// NOTE: avoid that flow. Light should only use TEMPERATURE, RGB_PRESET or RGB
 					let colorPrev, colorNext;
-					switch (lerpResult.prev["color-type"]) {
+					switch (lerpResult.prev.color["type"]) {
 						case "temperature":
-							colorPrev = getColorFromTemperature(lerpResult.prev["color-temperature"]);
+							colorPrev = getColorFromTemperature(lerpResult.prev.color["temperature"]);
 							break;
 						case "preset":
-							colorPrev = lightDefinition.color["list-rgb"][lerpResult.prev["color-preset-index"]];
+							colorPrev = lightDefinition.color["list-rgb"][lerpResult.prev.color["preset-index"]];
 							break;
 						case "rgb":
-							colorPrev = lerpResult.prev["color-rgb"];
+							colorPrev = lerpResult.prev.color["rgb"];
 							break;
 					}
-					switch (lerpResult.next["color-type"]) {
+					switch (lerpResult.next.color["type"]) {
 						case "temperature":
-							colorNext = getColorFromTemperature(lerpResult.next["color-temperature"]);
+							colorNext = getColorFromTemperature(lerpResult.next.color["temperature"]);
 							break;
 						case "preset":
-							colorNext = lightDefinition.color["list-rgb"][lerpResult.next["color-preset-index"]];
+							colorNext = lightDefinition.color["list-rgb"][lerpResult.next.color["preset-index"]];
 							break;
 						case "rgb":
-							colorNext = lerpResult.next["color-rgb"];
+							colorNext = lerpResult.next.color["rgb"];
 							break;
 					}
 					lightData.color.value_time.color_mode = ColorMode.RGB;

@@ -36,20 +36,24 @@
                 {
                     "time":0,
                     "turnOn":true,
-                    "power":0.5,
-                    "color-type":"temperature",
-                    "color-temperature":2000,
-                    "color-preset-index":0,
-                    "color-rgb":"#ffffff"
+                    "power":1.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":8000,
+                        "preset-index":0,
+                        "rgb":"#ffffff"
+                    }
                 },
                 {
                     "time":12000,
                     "turnOn":true,
-                    "power":1.0,
-                    "color-type":"temperature",
-                    "color-temperature":8000,
-                    "color-preset-index":1,
-                    "color-rgb":"#ffffff"
+                    "power":0.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":2000,
+                        "preset-index":1,
+                        "rgb":"#ffffff"
+                    }
                 }
             ]
         },
@@ -58,19 +62,39 @@
             "timeline":[
                 {
                     "time":0,
-                    "turnOn":true,
-                    "power":0.5,
-                    "color-mode":"temperature",
-                    "color-temperature":2000,
-                    "color-rgb":"#ffffff"
+                    "turnOn":false,
+                    "power":0.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":0
+                    }
+                },
+                {
+                    "time":6000,
+                    "turnOn":false,
+                    "power":0.1,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":2000
+                    }
                 },
                 {
                     "time":12000,
                     "turnOn":true,
                     "power":1.0,
-                    "color-mode":"temperature",
-                    "color-temperature":6000,
-                    "color-rgb":"#ffffff"
+                    "color":{
+                        "type":"temperature",
+                        "temperature":6000
+                    }
+                },
+                {
+                    "time":18000,
+                    "turnOn":true,
+                    "power":0.1,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":2000
+                    }
                 }
             ]
         },
@@ -80,25 +104,27 @@
                 {
                     "time":0,
                     "turnOn":true,
-                    "power":0.5,
-                    "color-mode":"temperature",
-                    "color-temperature":2000,
-                    "color-rgb":"#ffffff"
+                    "power":0.1,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":0
+                    }
                 },
                 {
                     "time":12000,
                     "turnOn":true,
                     "power":1.0,
-                    "color-mode":"temperature",
-                    "color-temperature":6000,
-                    "color-rgb":"#ffffff"
+                    "color":{
+                        "type":"temperature",
+                        "temperature":8000
+                    }
                 }
             ]
         }
     ],
     "other-objects":[
         {
-            "id":"#test-obj-animate_",
+            "id":"#test-obj-animate",
             "timeline":[
                 {
                     "time":0,

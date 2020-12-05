@@ -41,7 +41,6 @@ var UIManager = {
 
 	initUI: function(){
 		this.mappingUI();
-		let _self = this;
 
 		// set up list light menu
 		for (let i=0; i<ScenarioData.light_definition.length; i++){
@@ -50,9 +49,9 @@ var UIManager = {
 			let button = document.createElement("button");
 			let imgUrl = ScenarioData.light_definition[i].img;
 			button.style.backgroundImage = "url("+imgUrl+")";
-			button.addEventListener("click", ()=>{_self.selectLight(i);});
-			button.addEventListener("mouseenter", ()=>{_self.previewLight(i);});
-			button.addEventListener("mouseleave", ()=>{_self.previewLight(_self.selectedLightIndex);});
+			button.addEventListener("click", ()=>{UIManager.selectLight(i);});
+			button.addEventListener("mouseenter", ()=>{UIManager.updateLightUI(i);});
+			button.addEventListener("mouseleave", ()=>{UIManager.updateLightUI(UIManager.selectedLightIndex);});
 			button.classList.add("button-hover-fade");
 			this.elementUI.light.menu.appendChild(button);
 
@@ -63,7 +62,7 @@ var UIManager = {
 				let colorItem = document.createElement("button");
 				colorItem.style.backgroundColor = listColorPresetData[j];
 				colorItem.classList.add("button-hover-fade");
-				colorItem.addEventListener("click", ()=>{_self.setLightColorPreset(j);});
+				colorItem.addEventListener("click", ()=>{UIManager.setLightColorPreset(j);});
 				colorItem.addEventListener("mouseenter", ()=>{});
 				colorItem.addEventListener("mouseleave", ()=>{});
 				listColorPresetEl.appendChild(colorItem);
@@ -77,9 +76,9 @@ var UIManager = {
 			let button = document.createElement("button");
 			let imgUrl = ScenarioData.scenario[i].img;
 			button.style.backgroundImage = "url("+imgUrl+")";
-			button.addEventListener("click", ()=>{_self.selectScenario(i);});
-			button.addEventListener("mouseenter", ()=>{_self.previewScenario(i);});
-			button.addEventListener("mouseleave", ()=>{_self.previewScenario(_self.selectedScenarioIndex);});
+			button.addEventListener("click", ()=>{UIManager.selectScenario(i);});
+			button.addEventListener("mouseenter", ()=>{UIManager.updateScenarioUI(i);});
+			button.addEventListener("mouseleave", ()=>{UIManager.updateScenarioUI(UIManager.selectedScenarioIndex);});
 			button.classList.add("button-hover-fade");
 			this.elementUI.scenario.menu.appendChild(button);
 		}
@@ -112,6 +111,8 @@ var UIManager = {
 		this.elementUI.time.inputDirectly.value = getTimeStringFromValue(this.selectedTime,1);
 		this.elementUI.time.slider.value = this.selectedTime;
 		this.elementUI.time.note.innerHTML = ScenarioData.timeline_data.note;
+
+		this.updateLightUI(this.selectedLightIndex);
 	},
 
 	setCurrentTime: function(){
@@ -133,76 +134,44 @@ var UIManager = {
 		DataManager.setScenario(index);
 		SceneManager.updateAll();
 
-		this.previewScenario(index);
+		this.updateScenarioUI(index);
+		this.updateLightUI(this.selectedLightIndex);
 	},
 
 	// trigger when user hover on scenario image, or when select scenario
-	previewScenario: function(index){
+	updateScenarioUI: function(index){
 		this.elementUI.scenario.name.innerHTML = ScenarioData.scenario[index].name;
 		this.elementUI.scenario.description.innerHTML = ScenarioData.scenario[index].description;
 	},
 
 	/*
-	//	light selection
+	//	light global config
 	*/
-	updateLightStatusUI: function(index){
-		let _self = this;
-		// light status (on/off)
-		if (DataManager.getLightIsOn(_self.selectedLightIndex)){
-			this.elementUI.light.status_btn.classList.remove("lightbulb-off");
-			this.elementUI.light.status_btn.classList.add("lightbulb-on");
-		}else{
-			this.elementUI.light.status_btn.classList.add("lightbulb-off");
-			this.elementUI.light.status_btn.classList.remove("lightbulb-on");
-		}
+	setStatusAllLight: function(isTurnOn){
+		DataManager.setLightIsOnManuallyAll(isTurnOn);
+		SceneManager.updateAllLight();
+		this.updateLightUI(this.selectedLightIndex);
 	},
-	updateLightPowerUI: function(){
-		let _self = this;
-		let lightDef = ScenarioData.light_definition[_self.selectedLightIndex];
-		let lightPower = DataManager.getLightPower(_self.selectedLightIndex);
-		this.elementUI.light.power.value.innerHTML = parseInt(lightPower.value*100) + "%";
-		this.elementUI.light.power.slider.min = lightDef.power.min.value;
-		this.elementUI.light.power.slider.max = lightDef.power.max.value;
-		this.elementUI.light.power.slider.value = lightPower.value;
+
+	resetAllLight: function(){
+		DataManager.resetAllLight();
+		SceneManager.updateAllLight();
+		this.updateLightUI(this.selectedLightIndex);
 	},
-	updateLightColorUI: function(){
-		let _self = this;
-		let lightDef = ScenarioData.light_definition[_self.selectedLightIndex];
-		let lightColorData = DataManager.getLightColor(_self.selectedLightIndex);
 
-		switch (lightColorData.color_mode) {
-			case ColorMode.TEMPERATURE:
-				this.elementUI.light.color.preview.style.backgroundColor = getColorFromTemperature(lightColorData.temperature.value);
-				break;
-			case ColorMode.RGB_PRESET:
-			case ColorMode.RGB:
-				this.elementUI.light.color.preview.style.backgroundColor = lightColorData.rgb_color;
-				break;
-		}
-
-		this.elementUI.light.color.temperature.container.hidden = lightDef.color["use-temperature"];
-		this.elementUI.light.color.temperature.slider.min = lightDef.color.temperature.min.value;
-		this.elementUI.light.color.temperature.slider.max = lightDef.color.temperature.max.value;
-		this.elementUI.light.color.temperature.slider.value = lightColorData.temperature.value;
-
-		this.elementUI.light.color.preset.container.hidden = lightDef.color["use-rgb"];
-
-		for (let i=0; i<this.elementUI.light.color.preset.list.length; i++){
-			this.elementUI.light.color.preset.list[i].hidden = !(i==_self.selectedLightIndex);
-		}
-
-		this.elementUI.light.color.preset.selectColorDirectly.hidden = lightDef.color["allow-select-rgb"];
-	},
+	/*
+	//	light selection & preview
+	*/
 
 	// trigger when user click on light image
 	selectLight: function(index){
 		if (index < 0 || index >= ScenarioData.light_data.length) return;
 		this.selectedLightIndex = index;
-		this.previewLight(index);
+		this.updateLightUI(index);
 	},
 
 	// trigger when user hover on light image, or when select light
-	previewLight: function(index){
+	updateLightUI: function(index){
 		let lightDef = ScenarioData.light_definition[index];
 		let lightData = ScenarioData.light_data[index];
 
@@ -210,67 +179,88 @@ var UIManager = {
 		this.elementUI.light.name.innerHTML = lightDef.name;
 		this.elementUI.light.description.innerHTML = lightDef.description;
 
-		this.updateLightStatusUI();
-		this.updateLightPowerUI();
-		this.updateLightColorUI();
+		this.updateLightStatusUI(index);
+		this.updateLightPowerUI(index);
+		this.updateLightColorUI(index);
 	},
 
+	updateLightStatusUI: function(index){
+		// light status (on/off)
+		if (DataManager.getLightIsOn(index)){
+			this.elementUI.light.status_btn.classList.remove("lightbulb-off");
+			this.elementUI.light.status_btn.classList.add("lightbulb-on");
+		}else{
+			this.elementUI.light.status_btn.classList.add("lightbulb-off");
+			this.elementUI.light.status_btn.classList.remove("lightbulb-on");
+		}
+	},
+	updateLightPowerUI: function(index){
+		let lightDef = ScenarioData.light_definition[index];
+		let lightPower = DataManager.getLightPower(index);
+		this.elementUI.light.power.value.innerHTML = parseInt(lightPower.value*100) + "%";
+		this.elementUI.light.power.slider.min = lightDef.power.min.value;
+		this.elementUI.light.power.slider.max = lightDef.power.max.value;
+		this.elementUI.light.power.slider.value = lightPower.value;
+	},
+	updateLightColorUI: function(index){
+		let lightDef = ScenarioData.light_definition[index];
+		let lightColorData = DataManager.getLightColor(index);
+
+		this.elementUI.light.color.preview.style.backgroundColor = lightColorData.rgb_color;
+
+		this.elementUI.light.color.temperature.container.hidden = !lightDef.color["use-temperature"];
+		this.elementUI.light.color.temperature.slider.min = lightDef.color.temperature.min.value;
+		this.elementUI.light.color.temperature.slider.max = lightDef.color.temperature.max.value;
+		this.elementUI.light.color.temperature.slider.value = lightColorData.temperature.value;
+
+		this.elementUI.light.color.preset.container.hidden = !lightDef.color["use-rgb"];
+
+		for (let i=0; i<this.elementUI.light.color.preset.list.length; i++){
+			this.elementUI.light.color.preset.list[i].hidden = !(i==index);
+		}
+
+		this.elementUI.light.color.preset.selectColorDirectly.hidden = !lightDef.color["allow-select-rgb"];
+	},
+
+	
 	/*
 	//	light config
 	*/
-	setStatusAllLight: function(isTurnOn){
-		DataManager.setLightIsOnManuallyAll(isTurnOn);
-		SceneManager.updateAllLight();
-		this.previewLight();
-	},
 	toggleLightStatus: function(){
-		let _self = this;
-		let isLightOn = DataManager.getLightIsOn(_self.selectedLightIndex);
+		let isLightOn = DataManager.getLightIsOn(this.selectedLightIndex);
 		this.setLightStatus(!isLightOn);
 	},
 	setLightStatus: function(isOn){
-		let _self = this;
-		DataManager.setLightIsOnManually(_self.selectedLightIndex, isOn);
-		SceneManager.updateLightIsOn(_self.selectedLightIndex);
-		this.updateLightStatusUI();
-	},
-	setLightPower: function(power){
-		let _self = this;
-		DataManager.setLightPowerManually(_self.selectedLightIndex, power);
-		SceneManager.updateLightPower(_self.selectedLightIndex);
-		this.updateLightPowerUI();
-	},
-
-	setLightTemperature: function(temperature){
-		let _self = this;
-		DataManager.setLightColorManually(_self.selectedLightIndex, ColorMode.TEMPERATURE, temperature);
-		SceneManager.updateLightColor(_self.selectedLightIndex);
-		this.updateLightColorUI();
-	},
-	setLightColorPreset: function(preset_index){
-		let _self = this;
-		DataManager.setLightColorManually(_self.selectedLightIndex, ColorMode.RGB_PRESET, preset_index);
-		SceneManager.updateLightColor(_self.selectedLightIndex);
-		this.updateLightColorUI();
-	},
-	setLightColorRGB: function(color){
-		let _self = this;
-		DataManager.setLightColorManually(_self.selectedLightIndex, ColorMode.RGB, color);
-		SceneManager.updateLightColor(_self.selectedLightIndex);
-		this.updateLightColorUI();
+		DataManager.setLightIsOnManually(this.selectedLightIndex, isOn);
+		SceneManager.updateLight(this.selectedLightIndex);
+		this.updateLightStatusUI(this.selectedLightIndex);
 	},
 
 	resetLight: function(){
-		let _self = this;
-		DataManager.resetLight(_self.selectedLightIndex);
-		SceneManager.updateLight(_self.selectedLightIndex);
-		this.previewLight(_self.selectedLightIndex);
+		DataManager.resetLight(this.selectedLightIndex);
+		SceneManager.updateLight(this.selectedLightIndex);
+		this.updateLightUI(this.selectedLightIndex);
+	},
+	
+	setLightPower: function(power){
+		DataManager.setLightPowerManually(this.selectedLightIndex, power);
+		SceneManager.updateLightPower(this.selectedLightIndex);
+		this.updateLightPowerUI(this.selectedLightIndex);
 	},
 
-	resetAllLight: function(){
-		let _self = this;
-		DataManager.resetAllLight();
-		SceneManager.updateAllLight();
-		this.previewLight(_self.selectedLightIndex);
+	setLightTemperature: function(temperature){
+		DataManager.setLightColorManually(this.selectedLightIndex, ColorMode.TEMPERATURE, temperature);
+		SceneManager.updateLightColor(this.selectedLightIndex);
+		this.updateLightColorUI(this.selectedLightIndex);
+	},
+	setLightColorPreset: function(preset_index){
+		DataManager.setLightColorManually(this.selectedLightIndex, ColorMode.RGB_PRESET, preset_index);
+		SceneManager.updateLightColor(this.selectedLightIndex);
+		this.updateLightColorUI(this.selectedLightIndex);
+	},
+	setLightColorRGB: function(color){
+		DataManager.setLightColorManually(this.selectedLightIndex, ColorMode.RGB, color);
+		SceneManager.updateLightColor(this.selectedLightIndex);
+		this.updateLightColorUI(this.selectedLightIndex);
 	}
 }
