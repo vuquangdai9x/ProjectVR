@@ -1,6 +1,6 @@
 var UIManager = {
+	debug: false,
 	selectedScenarioIndex: -1, 
-	selectedTime: -1, 
 	selectedLightIndex: -1,
 	mappingUI: function(){
 		this.elementUI = {
@@ -35,12 +35,16 @@ var UIManager = {
 				inputDirectly: document.querySelector("#input-time > input"),
 				slider: document.querySelector("#input-time-slider > input"),
 				note: document.querySelector("#time-description")
+			},
+			debug:{
+				log: document.querySelector("#debug")
 			}
 		};
 	},
 
 	initUI: function(){
 		this.mappingUI();
+		this.elementUI.debug.log.hidden = !this.debug;
 
 		// set up list light menu
 		for (let i=0; i<ScenarioData.light_definition.length; i++){
@@ -88,6 +92,67 @@ var UIManager = {
 		this.setCurrentTime();
 	},
 
+	toggleDebug: function(){
+		this.debug = !this.debug;
+		this.elementUI.debug.log.hidden = !this.debug;
+		this.updateDebugLog();
+	},
+
+	updateDebugLog: function(){
+		if (!this.debug) return;
+
+		let lightData = ScenarioData.light_data[this.selectedLightIndex];
+		let str = "";
+		str += "<p><b>" + ScenarioData.light_definition[this.selectedLightIndex].name + "</b></p>";
+
+		str += "<p>";
+		switch (lightData.isLightOn.modifyLevel) {
+			case ModifyLevel.TIME:
+				str += "TurnOn modifyLevel: Time";
+				break;
+			case ModifyLevel.SCENARIO:
+				str += "TurnOn modifyLevel: Scenario";
+				break;
+			case ModifyLevel.LIGHT_CONFIG:
+				str += "TurnOn modifyLevel: Config";
+				break;
+		}
+		str += "</p>";
+		str += "<pre>" + JSON.stringify(DataManager.getLightIsOn(this.selectedLightIndex), undefined, 3) + "</pre>";
+
+		str += "<p>";
+		switch (lightData.power.modifyLevel) {
+			case ModifyLevel.TIME:
+				str += "Power modifyLevel: Time";
+				break;
+			case ModifyLevel.SCENARIO:
+				str += "Power modifyLevel: Scenario";
+				break;
+			case ModifyLevel.LIGHT_CONFIG:
+				str += "Power modifyLevel: Config";
+				break;
+		}
+		str += "</p>";
+		str += "<pre>" + JSON.stringify(DataManager.getLightPower(this.selectedLightIndex), undefined, 3) + "</pre>";
+
+		str += "<p>";
+		switch (lightData.color.modifyLevel) {
+			case ModifyLevel.TIME:
+				str += "Color modifyLevel: Time";
+				break;
+			case ModifyLevel.SCENARIO:
+				str += "Color modifyLevel: Scenario";
+				break;
+			case ModifyLevel.LIGHT_CONFIG:
+				str += "Color modifyLevel: Config";
+				break;
+		}
+		str += "</p>";
+		str += "<pre>" + JSON.stringify(DataManager.getLightColor(this.selectedLightIndex), undefined, 3) + "</pre>";
+
+		this.elementUI.debug.log.innerHTML = str;
+	},
+
 	/*
 	//	time selection
 	*/
@@ -102,17 +167,18 @@ var UIManager = {
 		}
 		time = time % 24000;
 		time = parseInt(time);
-		this.selectedTime = time;
 
 		DataManager.setTime(time);
 		SceneManager.updateAll();
 
-		// update UI
-		this.elementUI.time.inputDirectly.value = getTimeStringFromValue(this.selectedTime,1);
-		this.elementUI.time.slider.value = this.selectedTime;
-		this.elementUI.time.note.innerHTML = ScenarioData.timeline_data.note;
-
+		this.updateTimeUI();
 		this.updateLightUI(this.selectedLightIndex);
+	},
+
+	updateTimeUI: function(){
+		this.elementUI.time.inputDirectly.value = getTimeStringFromValue(DataManager.currentTime,1);
+		this.elementUI.time.slider.value = DataManager.currentTime;
+		this.elementUI.time.note.innerHTML = ScenarioData.timeline_data.note;
 	},
 
 	setCurrentTime: function(){
@@ -135,6 +201,7 @@ var UIManager = {
 		SceneManager.updateAll();
 
 		this.updateScenarioUI(index);
+		this.updateTimeUI();
 		this.updateLightUI(this.selectedLightIndex);
 	},
 
@@ -193,6 +260,8 @@ var UIManager = {
 			this.elementUI.light.status_btn.classList.add("lightbulb-off");
 			this.elementUI.light.status_btn.classList.remove("lightbulb-on");
 		}
+
+		this.updateDebugLog();
 	},
 	updateLightPowerUI: function(index){
 		let lightDef = ScenarioData.light_definition[index];
@@ -201,6 +270,8 @@ var UIManager = {
 		this.elementUI.light.power.slider.min = lightDef.power.min.value;
 		this.elementUI.light.power.slider.max = lightDef.power.max.value;
 		this.elementUI.light.power.slider.value = lightPower.value;
+
+		this.updateDebugLog();
 	},
 	updateLightColorUI: function(index){
 		let lightDef = ScenarioData.light_definition[index];
@@ -220,6 +291,8 @@ var UIManager = {
 		}
 
 		this.elementUI.light.color.preset.selectColorDirectly.hidden = !lightDef.color["allow-select-rgb"];
+
+		this.updateDebugLog();
 	},
 
 	

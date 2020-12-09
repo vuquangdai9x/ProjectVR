@@ -101,7 +101,7 @@ var ScenarioData = {
 
 var DataManager = {
 	isInDefaultScenario: true,
-
+	currentTime: 0,
 	/*
 	// 	load data
 	*/
@@ -355,11 +355,41 @@ var DataManager = {
 			lerpValue
 		);
 
+		if (def_block.min["config-intensity"] && def_block.max["config-intensity"]){
+			power_data_block.intensity = [];
+			for (let i=0; i<def_block.min["config-intensity"].length; i++){
+				power_data_block.intensity.push(
+					lerpFloat(
+						def_block.min["config-intensity"][i],
+						def_block.max["config-intensity"][i],
+						lerpValue
+					)
+				);
+			}
+		}else{
+			power_data_block.intensity = null;
+		}
+
 		power_data_block.emissive_intensity_all = lerpFloat(
 			def_block.min["config-emissive-intensity-all"],
 			def_block.max["config-emissive-intensity-all"],
 			lerpValue
 		);
+
+		if (def_block.min["config-emissive-intensity"] && def_block.max["config-emissive-intensity"]){
+			power_data_block.emissive_intensity = [];
+			for (let i=0; i<def_block.min["config-emissive-intensity"].length; i++){
+				power_data_block.emissive_intensity.push(
+					lerpFloat(
+						def_block.min["config-emissive-intensity"][i],
+						def_block.max["config-emissive-intensity"][i],
+						lerpValue
+					)
+				);
+			}
+		}else{
+			power_data_block.emissive_intensity = null;
+		}
 	},
 	updateColorTemperatureDataBlock: function(temperature_data_block, def_block, temperature){
 		let lerpValue = (temperature-def_block.min["value"])/(def_block.max["value"]-def_block.min["value"]);
@@ -372,11 +402,41 @@ var DataManager = {
 			lerpValue
 		);
 
+		if (def_block.min["config-temperature"] && def_block.max["config-temperature"]){
+			temperature_data_block.temperature = [];
+			for (let i=0; i<def_block.min["config-temperature"].length; i++){
+				temperature_data_block.temperature.push(
+					lerpFloat(
+						def_block.min["config-temperature"][i],
+						def_block.max["config-temperature"][i],
+						lerpValue
+					)
+				);
+			}
+		}else{
+			temperature_data_block.temperature = null;
+		}
+
 		temperature_data_block.emissive_temperature_all = lerpFloat(
 			def_block.min["config-emissive-temperature-all"],
 			def_block.max["config-emissive-temperature-all"],
 			lerpValue
 		);
+
+		if (def_block.min["config-emissive-temperature"] && def_block.max["config-emissive-temperature"]){
+			temperature_data_block.emissive_temperature = [];
+			for (let i=0; i<def_block.min["config-emissive-temperature"].length; i++){
+				temperature_data_block.emissive_temperature.push(
+					lerpFloat(
+						def_block.min["config-emissive-temperature"][i],
+						def_block.max["config-emissive-temperature"][i],
+						lerpValue
+					)
+				);
+			}
+		}else{
+			temperature_data_block.emissive_temperature = null;
+		}
 	},
 
 	setLightIsOnManuallyAll: function(isTurnOn){
@@ -467,65 +527,69 @@ var DataManager = {
 	*/
 
 	setScenario: function(scenario_index){
-		if (scenario_index == 0 
-			|| scenario_index < 0 || scenario_index >= ScenarioData.scenario.length-1){
-			// default scenario
-		this.isInDefaultScenario = true;
-			// if modifyLevel of lights is SCENARIO, lower it to TIME
-			for (let i=0; i<ScenarioData.light_data.length; i++){
-				let lightData = ScenarioData.light_data[i];
-				if (lightData.isLightOn.modifyLevel == ModifyLevel.SCENARIO){
-					lightData.isLightOn.modifyLevel = ModifyLevel.TIME;
-				}
-				if (lightData.power.modifyLevel == ModifyLevel.SCENARIO){
-					lightData.power.modifyLevel = ModifyLevel.TIME;
-				}
-				if (lightData.color.modifyLevel == ModifyLevel.SCENARIO){
-					lightData.color.modifyLevel = ModifyLevel.TIME;
-				}
+		// reset modifyLevel of lights to TIME if it is SCENARIO
+		for (let i=0; i<ScenarioData.light_data.length; i++){
+			let lightData = ScenarioData.light_data[i];
+			if (lightData.isLightOn.modifyLevel == ModifyLevel.SCENARIO){
+				lightData.isLightOn.modifyLevel = ModifyLevel.TIME;
 			}
+			if (lightData.power.modifyLevel == ModifyLevel.SCENARIO){
+				lightData.power.modifyLevel = ModifyLevel.TIME;
+			}
+			if (lightData.color.modifyLevel == ModifyLevel.SCENARIO){
+				lightData.color.modifyLevel = ModifyLevel.TIME;
+			}
+		}
+		if (scenario_index <= 0 || scenario_index >= ScenarioData.scenario.length){
+			// default scenario
+			this.isInDefaultScenario = true;
 		}else{
+			this.setTime(ScenarioData.scenario[scenario_index].time);
 			let listLightInScenario = ScenarioData.scenario[scenario_index].lights;
 			for (let i=0; i<listLightInScenario.length; i++){
 				let lightData = ScenarioData.light_data[listLightInScenario[i].index];
 				let lightDef = ScenarioData.light_definition[listLightInScenario[i].index];
 				if (lightData){
-					if (lightData.isLightOn.modifyLevel < ModifyLevel.SCENARIO){
-						lightData.isLightOn.modifyLevel = ModifyLevel.SCENARIO;
+					if (listLightInScenario[i].turnOn){
+						if (lightData.isLightOn.modifyLevel < ModifyLevel.SCENARIO){
+							lightData.isLightOn.modifyLevel = ModifyLevel.SCENARIO;
+						}
+						lightData.isLightOn.value_scenario = listLightInScenario[i].turnOn;
 					}
-					lightData.isLightOn.value_scenario = listLightInScenario[i].turnOn;
-
-					if (lightData.power.modifyLevel < ModifyLevel.SCENARIO){
-						lightData.power.modifyLevel = ModifyLevel.SCENARIO;
+					if (listLightInScenario[i].power){
+						if (lightData.power.modifyLevel < ModifyLevel.SCENARIO){
+							lightData.power.modifyLevel = ModifyLevel.SCENARIO;
+						}
+						this.updateLightPowerDataBlock(
+							lightData.power.value_scenario, 
+							lightDef.power, 
+							listLightInScenario[i].power
+						);
 					}
-					this.updateLightPowerDataBlock(
-						lightData.power.value_scenario, 
-						lightDef.power, 
-						listLightInScenario[i].power
-					);
-
-					if (lightData.color.modifyLevel < ModifyLevel.SCENARIO){
-						lightData.color.modifyLevel = ModifyLevel.SCENARIO;
-					}
-					switch (listLightInScenario[i].color.color_mode) {
-						case "temperature":
-							lightData.color.value_scenario.color_mode = ColorMode.TEMPERATURE;
-							this.updateColorTemperatureDataBlock(
-								lightData.color.value_scenario.temperature,
-								lightDef.color.temperature,
-								listLightInScenario[i].color["temperature"]
-							);
-							lightData.color.value_scenario.rgb_color = getColorFromTemperature(listLightInScenario[i].color["temperature"]);
-							break;
-						case "rgb-preset":
-							lightData.color.value_scenario.color_mode = ColorMode.RGB_PRESET;
-							lightData.color.value_scenario.rgb_preset_index = listLightInScenario[i].color["rgb-preset-index"];
-							lightData.color.value_scenario.rgb_color = lightDef.color["list-rgb"][listLightInScenario[i].color["rgb-preset-index"]];
-							break;
-						case "rgb":
-							lightData.color.value_scenario.color_mode = ColorMode.RGB;
-							lightData.color.value_scenario.rgb_color = listLightInScenario[i].color["rgb"];
-							break;
+					if (listLightInScenario[i].color){
+						if (lightData.color.modifyLevel < ModifyLevel.SCENARIO){
+							lightData.color.modifyLevel = ModifyLevel.SCENARIO;
+						}
+						switch (listLightInScenario[i].color.color_mode) {
+							case "temperature":
+								lightData.color.value_scenario.color_mode = ColorMode.TEMPERATURE;
+								this.updateColorTemperatureDataBlock(
+									lightData.color.value_scenario.temperature,
+									lightDef.color.temperature,
+									listLightInScenario[i].color["temperature"]
+								);
+								lightData.color.value_scenario.rgb_color = getColorFromTemperature(listLightInScenario[i].color["temperature"]);
+								break;
+							case "rgb-preset":
+								lightData.color.value_scenario.color_mode = ColorMode.RGB_PRESET;
+								lightData.color.value_scenario.rgb_preset_index = listLightInScenario[i].color["rgb-preset-index"];
+								lightData.color.value_scenario.rgb_color = lightDef.color["list-rgb"][listLightInScenario[i].color["rgb-preset-index"]];
+								break;
+							case "rgb":
+								lightData.color.value_scenario.color_mode = ColorMode.RGB;
+								lightData.color.value_scenario.rgb_color = listLightInScenario[i].color["rgb"];
+								break;
+						}
 					}
 				}
 			}
@@ -537,6 +601,7 @@ var DataManager = {
 	*/
 
 	setTime: function(time){
+		this.currentTime = time;
 		this.updateSunByTime(time);
 		this.updateSkyByTime(time);
 		this.updateOtherObjectsByTime(time);
@@ -557,7 +622,7 @@ var DataManager = {
 			if (time <= timeline[0].time){
 				prev = timeline[timeline.length-1];
 				next = timeline[0];
-				lerpValue = (time-(prev.time-24000))/(next.time-prev.time);
+				lerpValue = (time+24000-prev.time)/(next.time+24000-prev.time);
 			}else if (time >= timeline[timeline.length-1].time){
 				prev = timeline[timeline.length-1];
 				next = timeline[0];

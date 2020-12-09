@@ -22,6 +22,7 @@
         {
             "name":"Tiếp khách",
             "description":"Lorem ipsum...",
+            "time":8000,
             "img":"resources/img/conference-room-768441_640.jpg",
             "lights":[
                 {
@@ -37,7 +38,6 @@
                 },
                 {
                     "index":2,
-                    "turnOn":true,
                     "power":1.0,
                     "color":{
                         "color-mode":"rgb",
@@ -47,7 +47,6 @@
                 },
                 {
                     "index":3,
-                    "turnOn":true,
                     "power":1.0,
                     "color":{
                         "color-mode":"rgb",
@@ -59,7 +58,7 @@
             "other-objects":[
                 {
                     "query":"#window1",
-                    "visible":true,
+                    "visible":false,
                     "position":{
                         "x":1,
                         "y":1,
@@ -85,13 +84,15 @@
             "time":17000,
             "lights":[
                 {
-                    "index":0,
+                    "index":1,
                     "turnOn":true,
                     "power":0.5,
-                    "color-mode":"temperature",
-                    "color-temperature":2000,
-                    "color-rgb-preset-index":0,
-                    "color-rgb":"#ffffff"
+                    "color":{
+                        "color-mode":"rgb-preset",
+                        "temperature":2000,
+                        "rgb-preset-index":0,
+                        "rgb":"#ffffff"
+                    }
                 }
             ]
         }

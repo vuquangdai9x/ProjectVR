@@ -50,7 +50,7 @@
             "img":"resources/img/compact-ut4-11w.jpg",
             "allow_config_manually":true,
             "list-light-query":[
-                ".flatCeilLED"
+                "#flat-ceil-led-direct", "#flat-ceil-led-reflect"
             ],
             "list-object-query":[
                 "#flatCeilLEDObj"
@@ -59,11 +59,13 @@
                 "min":{
                     "value":0.2,
                     "config-intensity-all":0.1,
+                    "config-intensity":[0.2, 0.1],
                     "config-emissive-intensity-all":0.2
                 },
                 "max":{
                     "value":1.0,
-                    "config-intensity-all":0.4,
+                    "config-intensity-all":1.0,
+                    "config-intensity":[0.8, 0.4],
                     "config-emissive-intensity-all":1.0
                 }
             },

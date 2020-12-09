@@ -34,23 +34,34 @@
             "index":0,
             "timeline":[
                 {
-                    "time":0,
+                    "time":1000,
                     "turnOn":true,
-                    "power":1.0,
+                    "power":0.4,
                     "color":{
                         "type":"temperature",
-                        "temperature":8000,
+                        "temperature":1000,
                         "preset-index":0,
                         "rgb":"#ffffff"
                     }
                 },
                 {
-                    "time":12000,
-                    "turnOn":true,
-                    "power":0.0,
+                    "time":17000,
+                    "turnOn":false,
+                    "power":0.4,
                     "color":{
                         "type":"temperature",
-                        "temperature":2000,
+                        "temperature":4000,
+                        "preset-index":1,
+                        "rgb":"#ffffff"
+                    }
+                },
+                {
+                    "time":20000,
+                    "turnOn":true,
+                    "power":1.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":8000,
                         "preset-index":1,
                         "rgb":"#ffffff"
                     }
@@ -104,10 +115,19 @@
                 {
                     "time":0,
                     "turnOn":true,
-                    "power":0.1,
+                    "power":0.3,
                     "color":{
                         "type":"temperature",
-                        "temperature":0
+                        "temperature":4000
+                    }
+                },
+                {
+                    "time":6000,
+                    "turnOn":true,
+                    "power":0.2,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":2000
                     }
                 },
                 {
@@ -116,7 +136,85 @@
                     "power":1.0,
                     "color":{
                         "type":"temperature",
-                        "temperature":8000
+                        "temperature":6000
+                    }
+                },
+                {
+                    "time":18000,
+                    "turnOn":true,
+                    "power":0.2,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":2000
+                    }
+                }
+            ]
+        },
+        {
+            "index":4,
+            "timeline":[
+                {
+                    "time":0,
+                    "turnOn":true,
+                    "power":0.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":4000
+                    }
+                },
+                {
+                    "time":12000,
+                    "turnOn":true,
+                    "power":1.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":6000
+                    }
+                }
+            ]
+        },
+        {
+            "index":5,
+            "timeline":[
+                {
+                    "time":0,
+                    "turnOn":true,
+                    "power":0.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":4000
+                    }
+                },
+                {
+                    "time":12000,
+                    "turnOn":true,
+                    "power":1.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":6000
+                    }
+                }
+            ]
+        },
+        {
+            "index":6,
+            "timeline":[
+                {
+                    "time":0,
+                    "turnOn":true,
+                    "power":0.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":4000
+                    }
+                },
+                {
+                    "time":12000,
+                    "turnOn":true,
+                    "power":1.0,
+                    "color":{
+                        "type":"temperature",
+                        "temperature":6000
                     }
                 }
             ]
@@ -129,25 +227,13 @@
                 {
                     "time":0,
                     "visible":true,
-                    "position":{
-                        "x":-3.93082,
-                        "y":1.663,
-                        "z":-3.53577
-                    },
-                    "rotation":{
-                        "x":0,
-                        "y":0,
-                        "z":0
-                    },
-                    "scale":{
-                        "x":1,
-                        "y":1,
-                        "z":1
-                    }
+                    "position":null,
+                    "rotation":null,
+                    "scale":null
                 },
                 {
                     "time":12000,
-                    "visible":false,
+                    "visible":true,
                     "position":{
                         "x":-8.93082,
                         "y":1.663,
